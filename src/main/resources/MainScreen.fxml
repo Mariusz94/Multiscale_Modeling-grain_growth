@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.mariuszlyszczarz.MainScreenController">
+   <bottom>
+      <AnchorPane nodeOrientation="RIGHT_TO_LEFT" prefHeight="25.0" prefWidth="200.0" style="-fx-border-color: gray;" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER_RIGHT" fillHeight="false" AnchorPane.leftAnchor="20.0">
+               <children>
+                  <Label fx:id="labelStatus" prefHeight="17.0" text="Ready" textAlignment="RIGHT" />
+                  <Label text=":" />
+                  <Label prefHeight="17.0" text="Status" textAlignment="RIGHT" />
+               </children>
+            </HBox>
+         </children>
+      </AnchorPane>
+   </bottom>
+   <left>
+      <AnchorPane prefWidth="600.0" style="-fx-border-color: gray;" BorderPane.alignment="CENTER">
+         <children>
+            <Pane layoutX="25.0" layoutY="14.0" prefHeight="112.0" prefWidth="550.0" style="-fx-background-color: #EDEDED;">
+               <children>
+                  <Label layoutX="38.0" layoutY="9.0" text="Size" />
+                  <Label layoutX="8.0" layoutY="40.0" text="x: " />
+                  <TextField fx:id="sizeXTextField" layoutX="24.0" layoutY="35.0" prefHeight="25.0" prefWidth="49.0" text="500" />
+                  <Label layoutX="8.0" layoutY="68.0" text="y: " />
+                  <TextField fx:id="sizeYTextField" layoutX="24.0" layoutY="62.0" prefHeight="25.0" prefWidth="49.0" text="500" />
+                  <Label layoutX="107.0" layoutY="9.0" text="Number of grains" />
+                  <TextField fx:id="numberOfGrainsTextField" layoutX="119.0" layoutY="36.0" prefHeight="25.0" prefWidth="49.0" text="50" />
+                  <Label layoutX="107.0" layoutY="68.0" text="Periodic:" />
+                  <CheckBox fx:id="periodicCheckBox" layoutX="168.0" layoutY="68.0" mnemonicParsing="false" />
+                  <Label layoutX="264.0" layoutY="9.0" text="Metchod" />
+                  <ChoiceBox fx:id="methodChoiceBox" layoutX="213.0" layoutY="35.0" prefWidth="150.0" />
+                  <Label layoutX="387.0" layoutY="40.0" text="Delay:" />
+                  <TextField fx:id="delayTextField" layoutX="430.0" layoutY="36.0" prefHeight="25.0" prefWidth="49.0" text="0" />
+                  <Button fx:id="startButton" layoutX="495.0" layoutY="62.0" mnemonicParsing="false" onAction="#clickStartButton" text="Start" />
+               </children>
+            </Pane>
+            <Pane layoutX="25.0" layoutY="136.0" prefHeight="112.0" prefWidth="550.0" style="-fx-background-color: #EDEDED;">
+               <children>
+                  <Label layoutX="14.0" layoutY="18.0" text="Number of inclusions:" textAlignment="RIGHT" />
+                  <TextField fx:id="numberOfInclusionsTextField" layoutX="142.0" layoutY="14.0" prefHeight="25.0" prefWidth="49.0" text="0" />
+                  <Label layoutX="14.0" layoutY="46.0" text="Size of inclusions:" textAlignment="RIGHT" />
+                  <TextField fx:id="sizeOfInclusionsTextField" layoutX="142.0" layoutY="42.0" prefHeight="25.0" prefWidth="49.0" text="10" />
+                  <Label layoutX="226.0" layoutY="19.0" text="Type of inclusions:" />
+                  <ChoiceBox fx:id="typeOfInclusionsChoiceBox" layoutX="338.0" layoutY="16.0" prefWidth="150.0" />
+                  <Label layoutX="226.0" layoutY="46.0" text="Method of print:" />
+                  <ChoiceBox fx:id="methodOfPrintChoiceBox" layoutX="338.0" layoutY="44.0" prefWidth="150.0" />
+               </children>
+            </Pane>
+         </children>
+      </AnchorPane>
+   </left>
+   <center>
+      <ScrollPane fitToHeight="true" fitToWidth="true" BorderPane.alignment="CENTER">
+         <content>
+            <StackPane>
+               <children>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <ImageView fx:id="imageView" fitHeight="500.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@image/MainScreen.jpg" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </HBox>
+               </children>
+            </StackPane>
+         </content>
+      </ScrollPane>
+   </center>
+   <top>
+      <MenuBar maxWidth="1.7976931348623157E308" prefWidth="10000.0" BorderPane.alignment="CENTER">
+         <menus>
+            <Menu mnemonicParsing="false" style="aligment: center;" text="File">
+               <items>
+                  <Menu mnemonicParsing="false" text="Export">
+                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#exportDataFile" text="Data file" />
+                        <MenuItem mnemonicParsing="false" onAction="#exportBitmap" text="Bitmap" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Import">
+                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#importDataFile" text="Data file" />
+                        <MenuItem mnemonicParsing="false" onAction="#importBitmap" text="Bitmap" />
+                     </items>
+                  </Menu>
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+   </top>
+</BorderPane>

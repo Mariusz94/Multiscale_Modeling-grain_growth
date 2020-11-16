@@ -4,12 +4,10 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import org.apache.log4j.Logger;
 
-import javax.swing.text.html.ImageView;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 public abstract class GrainGrowthModel {
@@ -102,7 +100,7 @@ public abstract class GrainGrowthModel {
         drawShape(sizeOfInclusions, typeOfInclusionsChoiceBox, bufferedImage, listOfInclusions);
     }
 
-    private List<Point> findAllTransitions(BufferedImage bufferedImage) {
+    public static List<Point> findAllTransitions(BufferedImage bufferedImage) {
         List<Point> listGrainBoundaries = new ArrayList<>();
         boolean isFind;
 
@@ -119,10 +117,8 @@ public abstract class GrainGrowthModel {
                                 listGrainBoundaries.add(new Point(x,y));
                                 isFind = true;
                             }
-                            if (isFind)continue;
                         }
                     }
-                    if (isFind) continue;
                 }
             }
         }

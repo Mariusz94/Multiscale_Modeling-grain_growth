@@ -5,7 +5,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.FileChooser;
 import org.apache.log4j.Logger;
 
 import javax.imageio.ImageIO;
@@ -21,8 +20,8 @@ public class FileManager {
         File file = MainScreenController.choiceFile("txt", "save");
         BufferedImage bufferedImage = SwingFXUtils.fromFXImage(imageView.getImage(),null);
 
-        FileWriter fileWriter = null;
-        BufferedWriter bufferedWriter = null;
+        FileWriter fileWriter;
+        BufferedWriter bufferedWriter;
         try {
             fileWriter = new FileWriter(file);
             bufferedWriter = new BufferedWriter(fileWriter);
@@ -51,8 +50,8 @@ public class FileManager {
         File file = MainScreenController.choiceFile("txt", "open");
         BufferedImage bufferedImage;
 
-        BufferedReader bufferedReader = null;
-        String[] dataFromFile = null;
+        BufferedReader bufferedReader;
+        String[] dataFromFile;
 
             bufferedReader = new BufferedReader(new FileReader(file.getPath()));
             String[] size = bufferedReader.readLine().split(" ");
@@ -98,20 +97,17 @@ public class FileManager {
     }
 
     public static void startReadFileColorInOtherThread(Logger logger, Button startButton, Label labelStatus) {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    startButton.setDisable(true);
-                    FileManager.setMapOfColor(FileManager.readMap());
-                    startButton.setDisable(false);
-                    logger.info("Map color has been read");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    logger.info("Map color hasn't been read");
-                    e.printStackTrace();
-                }
+        Runnable runnable = () -> {
+            try {
+                startButton.setDisable(true);
+                FileManager.setMapOfColor(FileManager.readMap());
+                startButton.setDisable(false);
+                logger.info("Map color has been read");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                logger.info("Map color hasn't been read");
+                e.printStackTrace();
             }
         };
         Thread thread = new Thread(runnable);

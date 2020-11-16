@@ -57,6 +57,11 @@
                   <ChoiceBox fx:id="methodOfPrintChoiceBox" layoutX="338.0" layoutY="44.0" prefWidth="150.0" />
                </children>
             </Pane>
+            <Pane layoutX="25.0" layoutY="257.0" prefHeight="112.0" prefWidth="550.0" style="-fx-background-color: #EDEDED;">
+               <children>
+                  <Button fx:id="grainBoundariesButton" layoutX="378.0" layoutY="73.0" mnemonicParsing="false" onAction="#clickGrainBoundariesButton" text="Generate grain boundaries" />
+               </children>
+            </Pane>
          </children>
       </AnchorPane>
    </left>

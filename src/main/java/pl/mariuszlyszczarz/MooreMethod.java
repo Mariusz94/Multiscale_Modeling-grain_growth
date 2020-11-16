@@ -1,18 +1,14 @@
 package pl.mariuszlyszczarz;
 
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import org.apache.log4j.Logger;
 
-import javax.swing.text.html.ImageView;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MooreMethod extends GrainGrowthModel {
 
-    public static final Logger logger = Logger.getLogger(MooreMethod.class);
+    //public static final Logger logger = Logger.getLogger(MooreMethod.class);
 
     @Override
     public BufferedImage implementationMethod(BufferedImage bufferedImage, CheckBox periodicCheckBox) {

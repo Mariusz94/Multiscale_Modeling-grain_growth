@@ -3,6 +3,9 @@ package pl.mariuszlyszczarz;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -11,6 +14,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -53,15 +57,6 @@ public class MainScreenController {
 
         FileManager.startReadFileColorInOtherThread(logger, startButton, labelStatus);
 
-        File file = new File(START_PICTURE);
-
-        try {
-            imageView.setImage(SwingFXUtils.toFXImage(ImageIO.read(file), null));
-            logger.debug("Show start image");
-        } catch (IOException e) {
-            logger.error("Don't find start image");
-        }
-
         labelStatus.setText("Ready");
         methodChoiceBox.getItems().addAll("Moore", "Von Neumann");
         methodChoiceBox.setValue("Moore");
@@ -86,21 +81,40 @@ public class MainScreenController {
                 imageView.setFitWidth(bufferedImage.getWidth());
                 imageView.setFitHeight(bufferedImage.getHeight());
 
-                //todo inclusion on the begin
-
-                bufferedImage = mooreMethod.putGrainsToImage(Integer.parseInt(numberOfGrainsTextField.getText()), bufferedImage);
                 final BufferedImage[] finalBufferedImage = {bufferedImage};
                 Runnable runnable = () -> {
+                    if(Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("At the beginning")){
+                        mooreMethod.putInclusionToPictureBeforeStart(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()),typeOfInclusionsChoiceBox, finalBufferedImage[0]);
+                        imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
+                        try {
+                            new Robot().delay(Integer.parseInt(delayTextField.getText()));
+                        } catch (AWTException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    finalBufferedImage[0] = mooreMethod.putGrainsToImage(Integer.parseInt(numberOfGrainsTextField.getText()), bufferedImage);
+
                     imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
                     while(!mooreMethod.isEndGrow(finalBufferedImage[0])){
                         try {
-                            Thread.sleep(Integer.parseInt(delayTextField.getText()));
-                        } catch (InterruptedException e) {
+                            new Robot().delay(Integer.parseInt(delayTextField.getText()));
+                        } catch (AWTException e) {
                             e.printStackTrace();
                         }
                         finalBufferedImage[0] = mooreMethod.implementationMethod((finalBufferedImage[0]),periodicCheckBox);
                         imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
                     }
+                    if(Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("After simulation")){
+                        mooreMethod.putInclusionToPictureAfterGrainGrowth(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()),typeOfInclusionsChoiceBox, finalBufferedImage[0]);
+                        try {
+                            new Robot().delay(Integer.parseInt(delayTextField.getText()));
+                        } catch (AWTException e) {
+                            e.printStackTrace();
+                        }
+                        imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
+                    }
+
                 };
 
                 Thread thread = new Thread(runnable);
@@ -117,7 +131,7 @@ public class MainScreenController {
     @FXML
     public void exportDataFile() {
         logger.info("Called method exportDataFile");
-        FileManager.saveDataToDataFile();
+        FileManager.saveDataToDataFile(imageView);
     }
 
     @FXML
@@ -132,12 +146,15 @@ public class MainScreenController {
         }
     }
 
-    ;
-
     @FXML
     public void importDataFile() {
         logger.info("Called method importDataFile");
-        FileManager.readDataFormDataFile();
+        try {
+            Image image = FileManager.readDataFormDataFile();
+            imageView.setImage(image);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -153,8 +170,6 @@ public class MainScreenController {
             logger.error("Can't open image");
         }
     }
-
-    ;
 
     public static File choiceFile(String extensionOfFile, String typeOfAction) {
 

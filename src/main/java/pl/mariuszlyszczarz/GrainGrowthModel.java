@@ -1,17 +1,22 @@
 package pl.mariuszlyszczarz;
 
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import org.apache.log4j.Logger;
 
 import javax.swing.text.html.ImageView;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public abstract class GrainGrowthModel {
     public static final Logger logger = Logger.getLogger(GrainGrowthModel.class);
 
-    final int IMAGE_BACKGROUND_COLOR = -1184275;
+    final static int IMAGE_BACKGROUND_COLOR = -1184275;
+    final static int IMAGE_INCLUSIONS_COLOR = -16777216;
 
     public abstract BufferedImage implementationMethod(BufferedImage bufferedImage, CheckBox periodicCheckBox);
 
@@ -66,6 +71,90 @@ public abstract class GrainGrowthModel {
             }
         }
         return true;
+    }
+
+    public void putInclusionToPictureBeforeStart(int numberOfInclusions, int sizeOfInclusions, ChoiceBox<String> typeOfInclusionsChoiceBox, BufferedImage bufferedImage) {
+        List<Point> listOfInclusions = new ArrayList<>();
+        for (int i = 0; i < numberOfInclusions; i++) {
+            Point inclusionPoint;
+            do{
+                inclusionPoint = generateRandomPoint(bufferedImage.getWidth(), bufferedImage.getHeight());
+            }
+            while (isPointInRangeAnotherInclusion(inclusionPoint, sizeOfInclusions, listOfInclusions));
+            listOfInclusions.add(inclusionPoint);
+        }
+
+        drawShape(sizeOfInclusions, typeOfInclusionsChoiceBox, bufferedImage, listOfInclusions);
+    }
+    public void putInclusionToPictureAfterGrainGrowth(int numberOfInclusions, int sizeOfInclusions, ChoiceBox<String> typeOfInclusionsChoiceBox, BufferedImage bufferedImage) {
+        List<Point> listOfAllTransitions = findAllTransitions(bufferedImage);
+        List<Point> listOfInclusions = new ArrayList<>();
+
+        for (int i = 0; i < numberOfInclusions; i++) {
+            Point inclusionPoint;
+            do{
+                inclusionPoint = listOfAllTransitions.get(new Random().nextInt(listOfAllTransitions.size()));
+            }
+            while (isPointInRangeAnotherInclusion(inclusionPoint, sizeOfInclusions, listOfInclusions));
+            listOfInclusions.add(inclusionPoint);
+        }
+
+        drawShape(sizeOfInclusions, typeOfInclusionsChoiceBox, bufferedImage, listOfInclusions);
+    }
+
+    private List<Point> findAllTransitions(BufferedImage bufferedImage) {
+        List<Point> listGrainBoundaries = new ArrayList<>();
+        boolean isFind;
+
+        for (int y = 0; y < bufferedImage.getHeight(); y++) {
+            for (int x = 0; x < bufferedImage.getWidth(); x++) {
+                isFind = false;
+                for (int y1 = -1; y1 < 2; y1++) {
+                    for (int x1 = -1; x1 < 2; x1++) {
+                        int tempX = x + x1;
+                        int tempY = y + y1;
+                        if ((tempX >= 0 && tempX < bufferedImage.getWidth() && tempY >= 0 && tempY < bufferedImage.getHeight())) {
+                            int value = bufferedImage.getRGB(tempX,tempY);
+                            if (bufferedImage.getRGB(x,y) != value && !isFind){
+                                listGrainBoundaries.add(new Point(x,y));
+                                isFind = true;
+                            }
+                            if (isFind)continue;
+                        }
+                    }
+                    if (isFind) continue;
+                }
+            }
+        }
+
+        return listGrainBoundaries;
+
+    }
+
+    private void drawShape(int sizeOfInclusions, ChoiceBox<String> typeOfInclusionsChoiceBox, BufferedImage bufferedImage, List<Point> listOfInclusions) {
+        Graphics2D graphics2D = (Graphics2D) bufferedImage.getGraphics();
+        graphics2D.setPaint(new Color(IMAGE_INCLUSIONS_COLOR));
+
+        switch (typeOfInclusionsChoiceBox.getValue()){
+            case "Circular":
+                listOfInclusions.forEach(s-> graphics2D.fillOval(s.x - sizeOfInclusions,s.y- sizeOfInclusions,2* sizeOfInclusions,2* sizeOfInclusions));
+                break;
+            case "Square":
+                int a = sizeOfInclusions /(int)(2*Math.sqrt(2));
+                listOfInclusions.forEach(s-> graphics2D.fillRect(s.x - a,s.y - a,2*a,2*a));
+        }
+    }
+
+    private boolean isPointInRangeAnotherInclusion(Point point, int sizeOfInclusions, List<Point> listOfInclusions){
+        for (Point inclusion : listOfInclusions) {
+            if (Math.abs(Math.sqrt(Math.pow(point.x-inclusion.x,2) + Math.pow(point.y-inclusion.y,2))) <= 2*sizeOfInclusions) return true; //todo do distance for square
+        }
+        return false;
+    }
+
+    public static void printInformationAboutColor(int number){
+        String hexColor = String.format("#%06X", (0xFFFFFF & number));
+        System.out.println(number + " to hex " + hexColor);
     }
 
     private static Color generateRandomColor(){

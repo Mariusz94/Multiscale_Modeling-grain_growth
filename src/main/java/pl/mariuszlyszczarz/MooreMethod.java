@@ -1,6 +1,7 @@
 package pl.mariuszlyszczarz;
 
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import org.apache.log4j.Logger;
 
 import javax.swing.text.html.ImageView;
@@ -18,6 +19,7 @@ public class MooreMethod extends GrainGrowthModel {
         BufferedImage bufferedImageNew = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
         for (int y = 0; y < bufferedImage.getHeight(); y++) {
             for (int x = 0; x < bufferedImage.getWidth(); x++) {
+
                 if (bufferedImage.getRGB(x, y) == IMAGE_BACKGROUND_COLOR) {
 
                     Map<Integer, Integer> neighborsMap = new HashMap<>();
@@ -36,7 +38,7 @@ public class MooreMethod extends GrainGrowthModel {
                                 } else if (tempY > bufferedImage.getHeight() - 1) tempY = 0;
                                 int value = bufferedImage.getRGB(tempX, tempY);
 
-                                if (value != IMAGE_BACKGROUND_COLOR) {
+                                if (value != IMAGE_BACKGROUND_COLOR && value != IMAGE_INCLUSIONS_COLOR) {
                                     if (neighborsMap.containsKey(value)) {
                                         neighborsMap.put(value, neighborsMap.get(value) + 1);
                                     } else {
@@ -48,7 +50,7 @@ public class MooreMethod extends GrainGrowthModel {
 
                             if (!periodicCheckBox.isSelected() && (tempX >= 0 && tempX < bufferedImage.getWidth() && tempY >= 0 && tempY < bufferedImage.getHeight())) {
                                 int value = bufferedImage.getRGB(tempX, tempY);
-                                if (value != IMAGE_BACKGROUND_COLOR) {
+                                if (value != IMAGE_BACKGROUND_COLOR && value != IMAGE_INCLUSIONS_COLOR) {
                                     if (neighborsMap.containsKey(value)) {
                                         neighborsMap.put(value, neighborsMap.get(value) + 1);
                                     } else {

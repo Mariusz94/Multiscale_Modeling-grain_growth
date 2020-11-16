@@ -10,20 +10,19 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 
 public class MainScreenController {
 
     public static final Logger logger = Logger.getLogger(MainScreenController.class);
-    public static final String START_PICTURE = "src/main/resources/image/MainScreen.png";
+    //public static final String START_PICTURE = "src/main/resources/image/MainScreen.png";
 
     @FXML
     BorderPane borderPane;
@@ -36,7 +35,7 @@ public class MainScreenController {
     ChoiceBox<String> methodChoiceBox, typeOfInclusionsChoiceBox, methodOfPrintChoiceBox;
 
     @FXML
-    Button startButton;
+    Button startButton, grainBoundariesButton;
 
     @FXML
     Label labelStatus;
@@ -83,8 +82,8 @@ public class MainScreenController {
 
                 final BufferedImage[] finalBufferedImage = {bufferedImage};
                 Runnable runnable = () -> {
-                    if(Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("At the beginning")){
-                        mooreMethod.putInclusionToPictureBeforeStart(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()),typeOfInclusionsChoiceBox, finalBufferedImage[0]);
+                    if (Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("At the beginning")) {
+                        mooreMethod.putInclusionToPictureBeforeStart(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()), typeOfInclusionsChoiceBox, finalBufferedImage[0]);
                         imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
                         try {
                             new Robot().delay(Integer.parseInt(delayTextField.getText()));
@@ -96,17 +95,17 @@ public class MainScreenController {
                     finalBufferedImage[0] = mooreMethod.putGrainsToImage(Integer.parseInt(numberOfGrainsTextField.getText()), bufferedImage);
 
                     imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
-                    while(!mooreMethod.isEndGrow(finalBufferedImage[0])){
+                    while (!mooreMethod.isEndGrow(finalBufferedImage[0])) {
                         try {
                             new Robot().delay(Integer.parseInt(delayTextField.getText()));
                         } catch (AWTException e) {
                             e.printStackTrace();
                         }
-                        finalBufferedImage[0] = mooreMethod.implementationMethod((finalBufferedImage[0]),periodicCheckBox);
+                        finalBufferedImage[0] = mooreMethod.implementationMethod((finalBufferedImage[0]), periodicCheckBox);
                         imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
                     }
-                    if(Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("After simulation")){
-                        mooreMethod.putInclusionToPictureAfterGrainGrowth(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()),typeOfInclusionsChoiceBox, finalBufferedImage[0]);
+                    if (Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("After simulation")) {
+                        mooreMethod.putInclusionToPictureAfterGrainGrowth(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()), typeOfInclusionsChoiceBox, finalBufferedImage[0]);
                         try {
                             new Robot().delay(Integer.parseInt(delayTextField.getText()));
                         } catch (AWTException e) {
@@ -126,6 +125,17 @@ public class MainScreenController {
 
         }
 
+    }
+
+    @FXML
+    public void clickGrainBoundariesButton(){
+        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(imageView.getImage(),null);
+        List<Point> listOfTransitions = GrainGrowthModel.findAllTransitions(bufferedImage);
+        Graphics2D graphics2D = (Graphics2D)bufferedImage.getGraphics();
+        graphics2D.setPaint(Color.WHITE);
+        graphics2D.fillRect(0,0,bufferedImage.getWidth(),bufferedImage.getHeight());
+        listOfTransitions.forEach(s -> bufferedImage.setRGB(s.x,s.y, Color.BLACK.getRGB()));
+        imageView.setImage(SwingFXUtils.toFXImage(bufferedImage,null));
     }
 
     @FXML
@@ -190,15 +200,6 @@ public class MainScreenController {
 
         return file;
     }
-
-    private void changeStatusToBusy() {
-        labelStatus.setText("Busy");
-    }
-
-    private void changeStatusToReady() {
-        labelStatus.setText("Ready");
-    }
-
 
 }
 

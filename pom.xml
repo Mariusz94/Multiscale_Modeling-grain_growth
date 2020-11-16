@@ -10,11 +10,30 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>bug</id>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                    <mainClass>com.mypackage.MyClass</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>7</source>
-                    <target>7</target>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
         </plugins>

@@ -2,10 +2,7 @@ package pl.mariuszlyszczarz;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -14,6 +11,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -40,15 +38,20 @@ public class MainScreenController {
     Label labelStatus;
 
     @FXML
-     ImageView imageView;
+    CheckBox periodicCheckBox;
 
     @FXML
-    public void initialize(){
-        BasicConfigurator.configure();
+    ImageView imageView;
+
+    @FXML
+    public void initialize() {
+        //BasicConfigurator.configure();
         logger.debug("Initialize has started");
 
         pane = borderPane;
         logger.debug("Create copy of borderPane");
+
+        FileManager.startReadFileColorInOtherThread(logger, startButton, labelStatus);
 
         File file = new File(START_PICTURE);
 
@@ -71,31 +74,74 @@ public class MainScreenController {
     }
 
     @FXML
-    public void clickStartButton(){
-    logger.info("Start button has been clicked");
+    public void clickStartButton() {
+        logger.info("Start button has been clicked");
+
+        switch (methodChoiceBox.getValue()) {
+            case "Moore":
+                logger.info("Moore algorithm has been started");
+
+                MooreMethod mooreMethod = new MooreMethod();
+                BufferedImage bufferedImage = mooreMethod.prepareImage(Integer.parseInt(sizeXTextField.getText()), Integer.parseInt(sizeYTextField.getText()));
+                imageView.setFitWidth(bufferedImage.getWidth());
+                imageView.setFitHeight(bufferedImage.getHeight());
+
+                //todo inclusion on the begin
+
+                bufferedImage = mooreMethod.putGrainsToImage(Integer.parseInt(numberOfGrainsTextField.getText()), bufferedImage);
+                final BufferedImage[] finalBufferedImage = {bufferedImage};
+                Runnable runnable = () -> {
+                    imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
+                    while(!mooreMethod.isEndGrow(finalBufferedImage[0])){
+                        try {
+                            Thread.sleep(Integer.parseInt(delayTextField.getText()));
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        finalBufferedImage[0] = mooreMethod.implementationMethod((finalBufferedImage[0]),periodicCheckBox);
+                        imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
+                    }
+                };
+
+                Thread thread = new Thread(runnable);
+                thread.start();
+
+                break;
+            case "Von Neumann":
+                logger.info("Moore Von Neumann has been started");
+
+        }
 
     }
 
     @FXML
-    public void exportDataFile(){
+    public void exportDataFile() {
         logger.info("Called method exportDataFile");
         FileManager.saveDataToDataFile();
     }
 
     @FXML
-    public void exportBitmap(){
+    public void exportBitmap() {
         logger.info("Called method exportBitmap");
-        FileManager.saveBitmap();
-    };
+        try {
+            FileManager.saveBitmap(imageView);
+            logger.info("Bitmap has been saved");
+        } catch (IOException e) {
+            logger.error("Bitmap hasn't been saved");
+            e.printStackTrace();
+        }
+    }
+
+    ;
 
     @FXML
-    public void importDataFile(){
+    public void importDataFile() {
         logger.info("Called method importDataFile");
         FileManager.readDataFormDataFile();
     }
 
     @FXML
-    public void importBitmap(){
+    public void importBitmap() {
         logger.info("Called method importBitmap");
         try {
             Image image = FileManager.readBitmap();
@@ -106,17 +152,19 @@ public class MainScreenController {
         } catch (IOException e) {
             logger.error("Can't open image");
         }
-    };
+    }
 
-    public static File choiceFile(String extensionOfFile, String typeOfAction){
+    ;
+
+    public static File choiceFile(String extensionOfFile, String typeOfAction) {
 
         FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter(extensionOfFile.toUpperCase()+" files (*." + extensionOfFile + ")", "*." + extensionOfFile);
+        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter(extensionOfFile.toUpperCase() + " files (*." + extensionOfFile + ")", "*." + extensionOfFile);
         fileChooser.getExtensionFilters().add(extensionFilter);
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home") + System.getProperty("file.separator") + "Desktop"));
 
         File file = null;
-        switch (typeOfAction){
+        switch (typeOfAction) {
             case "open":
                 file = fileChooser.showOpenDialog(pane.getScene().getWindow());
                 break;
@@ -128,8 +176,13 @@ public class MainScreenController {
         return file;
     }
 
-    private void changeStatusToBusy(){ labelStatus.setText("Busy");}
-    private void changeStatusToReady(){labelStatus.setText("Ready");}
+    private void changeStatusToBusy() {
+        labelStatus.setText("Busy");
+    }
+
+    private void changeStatusToReady() {
+        labelStatus.setText("Ready");
+    }
 
 
 }
@@ -146,19 +199,11 @@ public class MainScreenController {
     }*/
 
 
-//ziarna - grains
-//granice ziaren - grain boundaries
-//Modelowanie Wieloskalowe - Multiscale modeling
-//More
-//von Neumana
-//Periodyczny warunek brzegowy
 //http://home.agh.edu.pl/~lmadej/wp-content/uploads/wyklad_5a.pdf
 //http://home.agh.edu.pl/~lmadej/wp-content/uploads/wyklad_6_7-1.pdf
 
 //kupić folie na drzwi
 //zapytać o dekoder
 //castorama
-//punkt(x,y) x-kolumna y-wiersz
-//int[][] table = new int[y][x];
-//table[y][x];
+
 //http://home.agh.edu.pl/~lmadej/wp-content/uploads/LM_MSM_SN_2020-21_Project_1.pdf

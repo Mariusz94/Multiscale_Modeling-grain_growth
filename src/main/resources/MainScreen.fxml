@@ -32,7 +32,10 @@
                   <Label layoutX="8.0" layoutY="68.0" text="y: " />
                   <TextField fx:id="sizeYTextField" layoutX="24.0" layoutY="62.0" prefHeight="25.0" prefWidth="49.0" text="500" />
                   <Label layoutX="107.0" layoutY="9.0" text="Number of grains" />
-                  <TextField fx:id="numberOfGrainsTextField" layoutX="119.0" layoutY="36.0" prefHeight="25.0" prefWidth="49.0" text="50" />
+                  <TextField fx:id="numberOfGrainsTextField" layoutX="119.0" layoutY="36.0" prefHeight="25.0" prefWidth="49.0" text="50">
+                     <tooltip>
+                        <Tooltip text="max 100 000" />
+                     </tooltip></TextField>
                   <Label layoutX="107.0" layoutY="68.0" text="Periodic:" />
                   <CheckBox fx:id="periodicCheckBox" layoutX="168.0" layoutY="68.0" mnemonicParsing="false" />
                   <Label layoutX="264.0" layoutY="9.0" text="Metchod" />

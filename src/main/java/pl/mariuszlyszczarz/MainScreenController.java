@@ -75,55 +75,62 @@ public class MainScreenController {
                 logger.info("Moore algorithm has been started");
 
                 MooreMethod mooreMethod = new MooreMethod();
-                BufferedImage bufferedImage = mooreMethod.prepareImage(Integer.parseInt(sizeXTextField.getText()), Integer.parseInt(sizeYTextField.getText()));
-                imageView.setFitWidth(bufferedImage.getWidth());
-                imageView.setFitHeight(bufferedImage.getHeight());
-
-                final BufferedImage[] finalBufferedImage = {bufferedImage};
-                Runnable runnable = () -> {
-                    if (Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("At the beginning")) {
-                        mooreMethod.putInclusionToPictureBeforeStart(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()), typeOfInclusionsChoiceBox, finalBufferedImage[0]);
-                        imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
-                        try {
-                            new Robot().delay(Integer.parseInt(delayTextField.getText()));
-                        } catch (AWTException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    finalBufferedImage[0] = mooreMethod.putGrainsToImage(Integer.parseInt(numberOfGrainsTextField.getText()), bufferedImage);
-
-                    imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
-                    while (!mooreMethod.isEndGrow(finalBufferedImage[0])) {
-                        try {
-                            new Robot().delay(Integer.parseInt(delayTextField.getText()));
-                        } catch (AWTException e) {
-                            e.printStackTrace();
-                        }
-                        finalBufferedImage[0] = mooreMethod.implementationMethod((finalBufferedImage[0]), periodicCheckBox);
-                        imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
-                    }
-                    if (Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("After simulation")) {
-                        mooreMethod.putInclusionToPictureAfterGrainGrowth(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()), typeOfInclusionsChoiceBox, finalBufferedImage[0]);
-                        try {
-                            new Robot().delay(Integer.parseInt(delayTextField.getText()));
-                        } catch (AWTException e) {
-                            e.printStackTrace();
-                        }
-                        imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
-                    }
-
-                };
-
-                Thread thread = new Thread(runnable);
-                thread.start();
+                runMethodGrow(mooreMethod);
 
                 break;
             case "Von Neumann":
                 logger.info("Von Neumann algorithm has been started");
 
+                VonNeumannMethod vonNeumannMethod = new VonNeumannMethod();
+                runMethodGrow(vonNeumannMethod);
+
         }
 
+    }
+
+    private void runMethodGrow(GrainGrowthModel grainGrowthModel) {
+        BufferedImage bufferedImage = grainGrowthModel.prepareImage(Integer.parseInt(sizeXTextField.getText()), Integer.parseInt(sizeYTextField.getText()));
+        imageView.setFitWidth(bufferedImage.getWidth());
+        imageView.setFitHeight(bufferedImage.getHeight());
+
+        final BufferedImage[] finalBufferedImage = {bufferedImage};
+        Runnable runnable = () -> {
+            if (Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("At the beginning")) {
+                grainGrowthModel.putInclusionToPictureBeforeStart(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()), typeOfInclusionsChoiceBox, finalBufferedImage[0]);
+                imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
+                try {
+                    new Robot().delay(Integer.parseInt(delayTextField.getText()));
+                } catch (AWTException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            finalBufferedImage[0] = grainGrowthModel.putGrainsToImage(Integer.parseInt(numberOfGrainsTextField.getText()), bufferedImage);
+
+            imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
+            while (!grainGrowthModel.isEndGrow(finalBufferedImage[0])) {
+                try {
+                    new Robot().delay(Integer.parseInt(delayTextField.getText()));
+                } catch (AWTException e) {
+                    e.printStackTrace();
+                }
+                finalBufferedImage[0] = grainGrowthModel.implementationMethod((finalBufferedImage[0]), periodicCheckBox);
+                imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
+            }
+            if (Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("After simulation")) {
+                grainGrowthModel.putInclusionToPictureAfterGrainGrowth(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()), typeOfInclusionsChoiceBox, finalBufferedImage[0]);
+                try {
+                    new Robot().delay(Integer.parseInt(delayTextField.getText()));
+                } catch (AWTException e) {
+                    e.printStackTrace();
+                }
+                imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
+            }
+
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.start();
     }
 
     @FXML

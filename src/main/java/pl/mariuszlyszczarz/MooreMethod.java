@@ -58,7 +58,7 @@ public class MooreMethod extends GrainGrowthModel {
                     }
 
                     if (neighborsMap.size() != 0) {
-                        int mostCommonValue = 0;
+                        int mostCommonValue = 0; // todo random color if are the same
                         int counter = 0;
                         for (Map.Entry<Integer, Integer> entry : neighborsMap.entrySet()) {
                             if (entry.getValue() > counter) {

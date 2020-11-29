@@ -28,14 +28,14 @@ public class ColorGenerator {
     }
 
     private void saveMapToFile() throws IOException {
-        FileOutputStream fileOut = new FileOutputStream("./src/main/resources/mapOfColor.bat");
+        FileOutputStream fileOut = new FileOutputStream("./src/main/resources/mapOfColor.bin");
         ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
         objectOut.writeObject(mapOfColor);
         objectOut.close();
     }
 
     private Map<Integer,Integer> readMap() throws IOException, ClassNotFoundException {
-        FileInputStream fileInputStream = new FileInputStream("./src/main/resources/mapOfColor.bat");
+        FileInputStream fileInputStream = new FileInputStream("./src/main/resources/mapOfColor.bin");
         ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
         Map<Integer,Integer> map = (Map<Integer, Integer>) objectInputStream.readObject();
         objectInputStream.close();

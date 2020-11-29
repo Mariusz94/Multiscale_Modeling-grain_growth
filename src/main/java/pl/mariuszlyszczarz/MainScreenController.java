@@ -22,7 +22,6 @@ import java.util.List;
 public class MainScreenController {
 
     public static final Logger logger = Logger.getLogger(MainScreenController.class);
-    //public static final String START_PICTURE = "src/main/resources/image/MainScreen.png";
 
     @FXML
     BorderPane borderPane;
@@ -121,7 +120,7 @@ public class MainScreenController {
 
                 break;
             case "Von Neumann":
-                logger.info("Moore Von Neumann has been started");
+                logger.info("Von Neumann algorithm has been started");
 
         }
 
@@ -217,9 +216,5 @@ public class MainScreenController {
 
 //http://home.agh.edu.pl/~lmadej/wp-content/uploads/wyklad_5a.pdf
 //http://home.agh.edu.pl/~lmadej/wp-content/uploads/wyklad_6_7-1.pdf
-
-//kupić folie na drzwi
-//zapytać o dekoder
-//castorama
 
 //http://home.agh.edu.pl/~lmadej/wp-content/uploads/LM_MSM_SN_2020-21_Project_1.pdf

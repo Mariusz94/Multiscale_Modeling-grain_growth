@@ -82,17 +82,15 @@ public class FileManager {
         return SwingFXUtils.toFXImage(ImageIO.read(file), null);
     }
 
-    public static Map<Integer, Integer> readMap() throws IOException, ClassNotFoundException {
-        FileInputStream fileInputStream;
-        try {
-            fileInputStream = new FileInputStream("./src/main/resources/mapOfColor.bat"); //for IDE
-        }catch (Exception e){
-            fileInputStream = new FileInputStream("mapOfColor.bat");  //for jar file
+    public Map<Integer, Integer> readMap() throws IOException, ClassNotFoundException {
+
+        InputStream inputStream = getClass().getResourceAsStream("/mapOfColor.bin");
+
+        Map<Integer, Integer> map;
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
+            map = (Map<Integer, Integer>) objectInputStream.readObject();
         }
 
-        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-        Map<Integer, Integer> map = (Map<Integer, Integer>) objectInputStream.readObject();
-        objectInputStream.close();
         return map;
     }
 
@@ -100,7 +98,8 @@ public class FileManager {
         Runnable runnable = () -> {
             try {
                 startButton.setDisable(true);
-                FileManager.setMapOfColor(FileManager.readMap());
+
+                FileManager.setMapOfColor(new FileManager().readMap());
                 startButton.setDisable(false);
                 logger.info("Map color has been read");
             } catch (IOException e) {

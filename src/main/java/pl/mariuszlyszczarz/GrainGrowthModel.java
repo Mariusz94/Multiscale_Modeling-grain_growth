@@ -16,7 +16,7 @@ public abstract class GrainGrowthModel {
     final static int IMAGE_BACKGROUND_COLOR = -1184275;
     final static int IMAGE_INCLUSIONS_COLOR = -16777216;
 
-    public abstract BufferedImage implementationMethod(BufferedImage bufferedImage, CheckBox periodicCheckBox);
+    public abstract BufferedImage implementationMethod(BufferedImage bufferedImage, CheckBox periodicCheckBox, int percentChanceToFill);
 
     public Point generateRandomPoint(int maxX, int maxY){
         Point point = new Point();
@@ -146,6 +146,13 @@ public abstract class GrainGrowthModel {
             if (Math.abs(Math.sqrt(Math.pow(point.x-inclusion.x,2) + Math.pow(point.y-inclusion.y,2))) <= 2*sizeOfInclusions) return true; //todo do distance for square
         }
         return false;
+    }
+
+    boolean willBeFill(int percentChanceToFill) {
+        Random random = new Random();
+        int result = random.nextInt(100);
+        logger.debug("The drawn digit: " + result);
+        return result < percentChanceToFill;
     }
 
     public static void printInformationAboutColor(int number){

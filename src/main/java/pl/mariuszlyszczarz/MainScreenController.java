@@ -28,7 +28,7 @@ public class MainScreenController {
     private static BorderPane pane;
 
     @FXML
-    TextField sizeXTextField, sizeYTextField, numberOfGrainsTextField, delayTextField, numberOfInclusionsTextField, sizeOfInclusionsTextField;
+    TextField sizeXTextField, sizeYTextField, numberOfGrainsTextField, delayTextField, numberOfInclusionsTextField, sizeOfInclusionsTextField, percentChanceToFillTextField;
 
     @FXML
     ChoiceBox<String> methodChoiceBox, typeOfInclusionsChoiceBox, methodOfPrintChoiceBox;
@@ -89,48 +89,50 @@ public class MainScreenController {
     }
 
     private void runMethodGrow(GrainGrowthModel grainGrowthModel) {
-        BufferedImage bufferedImage = grainGrowthModel.prepareImage(Integer.parseInt(sizeXTextField.getText()), Integer.parseInt(sizeYTextField.getText()));
-        imageView.setFitWidth(bufferedImage.getWidth());
-        imageView.setFitHeight(bufferedImage.getHeight());
+        if (Integer.parseInt(percentChanceToFillTextField.getText().trim()) !=0) {
+            BufferedImage bufferedImage = grainGrowthModel.prepareImage(Integer.parseInt(sizeXTextField.getText()), Integer.parseInt(sizeYTextField.getText()));
+            imageView.setFitWidth(bufferedImage.getWidth());
+            imageView.setFitHeight(bufferedImage.getHeight());
 
-        final BufferedImage[] finalBufferedImage = {bufferedImage};
-        Runnable runnable = () -> {
-            if (Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("At the beginning")) {
-                grainGrowthModel.putInclusionToPictureBeforeStart(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()), typeOfInclusionsChoiceBox, finalBufferedImage[0]);
-                imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
-                try {
-                    new Robot().delay(Integer.parseInt(delayTextField.getText()));
-                } catch (AWTException e) {
-                    e.printStackTrace();
+            final BufferedImage[] finalBufferedImage = {bufferedImage};
+            Runnable runnable = () -> {
+                if (Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("At the beginning")) {
+                    grainGrowthModel.putInclusionToPictureBeforeStart(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()), typeOfInclusionsChoiceBox, finalBufferedImage[0]);
+                    imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
+                    try {
+                        new Robot().delay(Integer.parseInt(delayTextField.getText()));
+                    } catch (AWTException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
 
-            finalBufferedImage[0] = grainGrowthModel.putGrainsToImage(Integer.parseInt(numberOfGrainsTextField.getText()), bufferedImage);
+                finalBufferedImage[0] = grainGrowthModel.putGrainsToImage(Integer.parseInt(numberOfGrainsTextField.getText()), bufferedImage);
 
-            imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
-            while (!grainGrowthModel.isEndGrow(finalBufferedImage[0])) {
-                try {
-                    new Robot().delay(Integer.parseInt(delayTextField.getText()));
-                } catch (AWTException e) {
-                    e.printStackTrace();
-                }
-                finalBufferedImage[0] = grainGrowthModel.implementationMethod((finalBufferedImage[0]), periodicCheckBox);
                 imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
-            }
-            if (Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("After simulation")) {
-                grainGrowthModel.putInclusionToPictureAfterGrainGrowth(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()), typeOfInclusionsChoiceBox, finalBufferedImage[0]);
-                try {
-                    new Robot().delay(Integer.parseInt(delayTextField.getText()));
-                } catch (AWTException e) {
-                    e.printStackTrace();
+                while (!grainGrowthModel.isEndGrow(finalBufferedImage[0])) {
+                    try {
+                        new Robot().delay(Integer.parseInt(delayTextField.getText()));
+                    } catch (AWTException e) {
+                        e.printStackTrace();
+                    }
+                    finalBufferedImage[0] = grainGrowthModel.implementationMethod((finalBufferedImage[0]), periodicCheckBox, Integer.parseInt(percentChanceToFillTextField.getText().trim()));
+                    imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
                 }
-                imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
-            }
+                if (Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("After simulation")) {
+                    grainGrowthModel.putInclusionToPictureAfterGrainGrowth(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()), typeOfInclusionsChoiceBox, finalBufferedImage[0]);
+                    try {
+                        new Robot().delay(Integer.parseInt(delayTextField.getText()));
+                    } catch (AWTException e) {
+                        e.printStackTrace();
+                    }
+                    imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
+                }
 
-        };
+            };
 
-        Thread thread = new Thread(runnable);
-        thread.start();
+            Thread thread = new Thread(runnable);
+            thread.start();
+        }
     }
 
     @FXML

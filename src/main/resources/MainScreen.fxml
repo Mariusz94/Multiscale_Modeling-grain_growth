@@ -60,6 +60,9 @@
             <Pane layoutX="25.0" layoutY="257.0" prefHeight="112.0" prefWidth="550.0" style="-fx-background-color: #EDEDED;">
                <children>
                   <Button fx:id="grainBoundariesButton" layoutX="378.0" layoutY="73.0" mnemonicParsing="false" onAction="#clickGrainBoundariesButton" text="Generate grain boundaries" />
+                  <TextField fx:id="percentChanceToFillTextField" layoutX="126.0" layoutY="14.0" prefHeight="25.0" prefWidth="49.0" text="100" />
+                  <Label layoutX="6.0" layoutY="18.0" text="Percent chance to fill:" />
+                  <Label layoutX="175.0" layoutY="18.0" text="\%" />
                </children>
             </Pane>
          </children>

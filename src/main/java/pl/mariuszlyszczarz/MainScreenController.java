@@ -56,7 +56,7 @@ public class MainScreenController {
         FileManager.startReadFileColorInOtherThread(logger, startButton, labelStatus);
 
         labelStatus.setText("Ready");
-        methodChoiceBox.getItems().addAll("Moore", "Von Neumann");
+        methodChoiceBox.getItems().addAll("Moore", "Von Neumann", "Grain boundary shape control");
         methodChoiceBox.setValue("Moore");
         typeOfInclusionsChoiceBox.getItems().addAll("Circular", "Square");
         typeOfInclusionsChoiceBox.setValue("Circular");
@@ -83,6 +83,13 @@ public class MainScreenController {
 
                 VonNeumannMethod vonNeumannMethod = new VonNeumannMethod();
                 runMethodGrow(vonNeumannMethod);
+                break;
+            case "Grain boundary shape control":
+                logger.info("Grain boundary shape control algorithm has been started");
+
+                GrainBoundaryShapeControlMethod grainBoundaryShapeControlMethod = new GrainBoundaryShapeControlMethod();
+                runMethodGrow(grainBoundaryShapeControlMethod);
+                break;
 
         }
 

@@ -65,6 +65,18 @@
                   <Label layoutX="175.0" layoutY="18.0" text="\%" />
                </children>
             </Pane>
+            <Pane layoutX="25.0" layoutY="375.0" prefHeight="360.0" prefWidth="550.0" style="-fx-background-color: #EDEDED;">
+               <children>
+                  <VBox prefHeight="360.0" prefWidth="550.0">
+                     <children>
+                        <TableView fx:id="tableView" prefHeight="560.0" prefWidth="200.0">
+                           <columns>
+                           </columns>
+                        </TableView>
+                     </children>
+                  </VBox>
+               </children>
+            </Pane>
          </children>
       </AnchorPane>
    </left>

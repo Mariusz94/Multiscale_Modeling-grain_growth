@@ -66,6 +66,10 @@ public class ColorGenerator {
 
         return String.format("#%06X", (0xFFFFFF & bufferedImage.getRGB(x, y)));
     }
+    public static String getHexColor(int number){
+
+        return String.format("#%06X", (0xFFFFFF & number));
+    }
 
     public static void main(String[] args) {
         generateManyColor();

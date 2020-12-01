@@ -1,14 +1,16 @@
 package pl.mariuszlyszczarz;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TableView;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 
 public abstract class GrainGrowthModel {
     public static final Logger logger = Logger.getLogger(GrainGrowthModel.class);
@@ -153,6 +155,49 @@ public abstract class GrainGrowthModel {
         int result = random.nextInt(100);
         logger.debug("The drawn digit: " + result);
         return result < percentChanceToFill;
+    }
+
+    void fillInfoTable(TableView<TableInfoGrainModel> tableView, BufferedImage bufferedImage){
+        int numberOfCells = bufferedImage.getHeight() * bufferedImage.getWidth();
+        Map<Integer, Integer> mapOfGrains = new HashMap<>();
+        for (int y = 0; y < bufferedImage.getHeight(); y++) {
+            for (int x = 0; x < bufferedImage.getWidth(); x++) {
+                if (bufferedImage.getRGB(x,y) != IMAGE_BACKGROUND_COLOR){
+                    if (!mapOfGrains.containsKey(bufferedImage.getRGB(x,y))){
+                        mapOfGrains.put(bufferedImage.getRGB(x, y), 1);
+                    }else{
+                        mapOfGrains.put(bufferedImage.getRGB(x, y), mapOfGrains.get(bufferedImage.getRGB(x, y))+1);
+                    }
+                }
+            }
+        }
+
+        if (!mapOfGrains.isEmpty()) {
+            final ObservableList<TableInfoGrainModel> dataToTable = FXCollections.observableArrayList();
+            for (Map.Entry<Integer, Integer> entry : mapOfGrains.entrySet()) {
+                int idColor = 0;
+                for (Map.Entry<Integer, Integer> integerEntry : FileManager.getMapOfColor().entrySet()) {
+                    if (integerEntry.getValue().equals(entry.getKey())){
+                        idColor = integerEntry.getKey();
+                        break;
+                    }
+                }
+                TableInfoGrainModel tableInfoGrainModel = new TableInfoGrainModel(String.valueOf(idColor),
+                        String.valueOf(entry.getValue()),
+                        String.valueOf(100*(double)entry.getValue()/numberOfCells), //todo string format two number after dot
+                        String.valueOf(ColorGenerator.getHexColor(entry.getKey())));
+                dataToTable.add(tableInfoGrainModel);
+            }
+
+            FXCollections.sort(dataToTable);
+
+            tableView.setItems(dataToTable);
+            //todo delete
+
+
+
+
+        }
     }
 
     public static void printInformationAboutColor(int number){

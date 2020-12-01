@@ -63,6 +63,12 @@ public class MainScreenController {
         methodOfPrintChoiceBox.getItems().addAll("At the beginning", "After simulation");
         methodOfPrintChoiceBox.setValue("At the beginning");
 
+        imageView.setPickOnBounds(false);
+        //imageView.setOnMouseClicked(e-> System.out.println("Cords [" + (int)e.getX() +", "+ (int)e.getY()+"]" + " Color int =" +  SwingFXUtils.fromFXImage(imageView.getImage(), null).getRGB((int)e.getX(), (int)e.getY()) + ", hexColor = " + String.format("#%06X", (0xFFFFFF & SwingFXUtils.fromFXImage(imageView.getImage(), null).getRGB((int)e.getX(), (int)e.getY())))));
+        imageView.setOnMouseClicked(e-> System.out.println("Cords [" + (int)e.getX() +", "+ (int)e.getY()+"]" +
+                " Color int =" +  ColorGenerator.getIntColor(imageView, (int)e.getX(),(int)e.getY()) +
+                ", hexColor = " + ColorGenerator.getHexColor(imageView, (int)e.getX(),(int)e.getY())));
+
         logger.debug("Initialize has ended");
     }
 

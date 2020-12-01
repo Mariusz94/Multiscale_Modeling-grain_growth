@@ -1,8 +1,10 @@
 package pl.mariuszlyszczarz;
 
-import com.sun.corba.se.impl.orbutil.ObjectWriter;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.ImageView;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +46,25 @@ public class ColorGenerator {
 
     private static void printMap(Map<Integer,Integer> map){
         map.entrySet().forEach(s-> System.out.println(s.getKey() + " " + s.getValue()));
+    }
+
+    public static String getIntColor(ImageView imageView, int x, int y){
+        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(imageView.getImage(),null);
+
+        return String.valueOf(bufferedImage.getRGB(x,y));
+    }
+    public static String getIntColor(BufferedImage bufferedImage, int x, int y){
+
+        return String.valueOf(bufferedImage.getRGB(x,y));
+    }
+    public static String getHexColor(ImageView imageView, int x, int y){
+        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(imageView.getImage(),null);
+
+        return String.format("#%06X", (0xFFFFFF & bufferedImage.getRGB(x, y)));
+    }
+    public static String getHexColor(BufferedImage bufferedImage, int x, int y){
+
+        return String.format("#%06X", (0xFFFFFF & bufferedImage.getRGB(x, y)));
     }
 
     public static void main(String[] args) {

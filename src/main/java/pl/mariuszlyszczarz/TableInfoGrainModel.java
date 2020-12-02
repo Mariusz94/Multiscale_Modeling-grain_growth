@@ -2,11 +2,11 @@ package pl.mariuszlyszczarz;
 
 import javafx.beans.property.SimpleStringProperty;
 
-public class TableInfoGrainModel implements Comparable {
-    private SimpleStringProperty id;
-    private SimpleStringProperty size;
-    private SimpleStringProperty percent;
-    private SimpleStringProperty color;
+public class TableInfoGrainModel implements Comparable<TableInfoGrainModel> {
+    private final SimpleStringProperty id;
+    private final SimpleStringProperty size;
+    private final SimpleStringProperty percent;
+    private final SimpleStringProperty color;
 
     public TableInfoGrainModel(String id, String size, String percent, String color) {
         this.id = new SimpleStringProperty(id);
@@ -74,7 +74,7 @@ public class TableInfoGrainModel implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-        return Double.compare(Double.parseDouble(((TableInfoGrainModel) o).percent.get()), Double.parseDouble(this.percent.get()));
+    public int compareTo(TableInfoGrainModel o) {
+        return Double.compare(Double.parseDouble(o.percent.get()), Double.parseDouble(this.percent.get()));
     }
 }

@@ -2,13 +2,14 @@ package pl.mariuszlyszczarz;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.util.Callback;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.List;
 
@@ -182,9 +183,11 @@ public abstract class GrainGrowthModel {
                         break;
                     }
                 }
+                DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getNumberInstance(Locale.US);
+                decimalFormat.setMaximumFractionDigits(2);
                 TableInfoGrainModel tableInfoGrainModel = new TableInfoGrainModel(String.valueOf(idColor),
                         String.valueOf(entry.getValue()),
-                        String.valueOf(100*(double)entry.getValue()/numberOfCells), //todo string format two number after dot
+                        String.valueOf(decimalFormat.format(100*(double)entry.getValue()/numberOfCells)), //todo string format two number after dot
                         String.valueOf(ColorGenerator.getHexColor(entry.getKey())));
                 dataToTable.add(tableInfoGrainModel);
             }
@@ -192,7 +195,6 @@ public abstract class GrainGrowthModel {
             FXCollections.sort(dataToTable);
 
             tableView.setItems(dataToTable);
-            //todo delete
 
 
 

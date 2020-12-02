@@ -1,7 +1,5 @@
 package pl.mariuszlyszczarz;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -71,26 +69,43 @@ public class MainScreenController {
         methodOfPrintChoiceBox.setValue("At the beginning");
 
         TableColumn<TableInfoGrainModel, String> id = new TableColumn<>("Id");
-        id.setPrefWidth(75);
+        id.setPrefWidth(75.0);
         id.setStyle("-fx-alignment: CENTER");
         TableColumn<TableInfoGrainModel, String> size = new TableColumn<>("Size");
-        size.setPrefWidth(75);
+        size.setPrefWidth(75.0);
         size.setStyle("-fx-alignment: CENTER");
         TableColumn<TableInfoGrainModel, String> percent = new TableColumn<>("%");
-        percent.setPrefWidth(75);
+        percent.setPrefWidth(75.0);
         percent.setStyle("-fx-alignment: CENTER");
         TableColumn<TableInfoGrainModel, String> color = new TableColumn<>("Color");
+        Callback<TableColumn<TableInfoGrainModel, String>, TableCell<TableInfoGrainModel, String>> cellFactory =
+                new Callback<TableColumn<TableInfoGrainModel, String>, TableCell<TableInfoGrainModel, String>>() {
+                    public TableCell<TableInfoGrainModel, String> call(TableColumn p) {
+                        TableCell<TableInfoGrainModel, String> cell = new TableCell<TableInfoGrainModel, String>() {
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                setText(empty ? null : getString().substring(21,28));
+                                setStyle(""+getString() + "-fx-alignment: CENTER;");
+                            }
+
+                            private String getString() {
+                                return getItem() == null ? "" : "-fx-background-color:" + getItem() +";";
+                            }
+                        };
+                        return cell;
+                    }
+                };
+        color.setCellFactory(cellFactory);
         color.setPrefWidth(75);
         color.setStyle("-fx-alignment: CENTER");
         tableView.getColumns().addAll(id, size, percent, color);
-
         id.setCellValueFactory(new PropertyValueFactory<>("id"));
         size.setCellValueFactory(new PropertyValueFactory<>("size"));
         percent.setCellValueFactory(new PropertyValueFactory<>("percent"));
         color.setCellValueFactory(new PropertyValueFactory<>("color"));
 
         imageView.setPickOnBounds(false);
-        //imageView.setOnMouseClicked(e-> System.out.println("Cords [" + (int)e.getX() +", "+ (int)e.getY()+"]" + " Color int =" +  SwingFXUtils.fromFXImage(imageView.getImage(), null).getRGB((int)e.getX(), (int)e.getY()) + ", hexColor = " + String.format("#%06X", (0xFFFFFF & SwingFXUtils.fromFXImage(imageView.getImage(), null).getRGB((int)e.getX(), (int)e.getY())))));
         imageView.setOnMouseClicked(e-> System.out.println("Cords [" + (int)e.getX() +", "+ (int)e.getY()+"]" +
                 " Color int =" +  ColorGenerator.getIntColor(imageView, (int)e.getX(),(int)e.getY()) +
                 ", hexColor = " + ColorGenerator.getHexColor(imageView, (int)e.getX(),(int)e.getY())));
@@ -156,7 +171,7 @@ public class MainScreenController {
                     }
                     finalBufferedImage[0] = grainGrowthModel.implementationMethod((finalBufferedImage[0]), periodicCheckBox, Integer.parseInt(percentChanceToFillTextField.getText().trim()));
                     imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
-                    grainGrowthModel.fillInfoTable(tableView, finalBufferedImage[0]); //todo added
+                    grainGrowthModel.fillInfoTable(tableView, finalBufferedImage[0]);
                 }
                 if (Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("After simulation")) {
                     grainGrowthModel.putInclusionToPictureAfterGrainGrowth(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()), typeOfInclusionsChoiceBox, finalBufferedImage[0]);

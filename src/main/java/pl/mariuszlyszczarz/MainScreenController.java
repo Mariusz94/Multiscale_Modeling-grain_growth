@@ -175,14 +175,14 @@ public class MainScreenController {
                         e.printStackTrace();
                     }
                 }
-                if (bufferedImageDualPhase != null){
+                if (bufferedImageDualPhase != null) {
                     try {
                         new Robot().delay(Integer.parseInt(delayTextField.getText()));
                     } catch (AWTException e) {
                         e.printStackTrace();
                     }
                     delayTextField.setText("0"); //todo previous value
-                    bufferedImage[0] =null;
+                    bufferedImage[0] = null;
                     bufferedImage[0] = GrainGrowthModel.deepCopyOfBufferedImage(bufferedImageDualPhase);
                 }
 
@@ -272,11 +272,8 @@ public class MainScreenController {
         final BufferedImage[] bufferedImage = {GrainGrowthModel.deepCopyOfBufferedImage(coreBufferedImage)};
 
         Runnable runnable = () -> {
-            //System.out.println("wszedłem i myśle");
             bufferedImage[0] = grainGrowthModel.putGrainsToImageSubstructure(coreBufferedImage, Integer.parseInt(numberOfGrainsTextField.getText()), Integer.parseInt(numberOfGrainsSubstructureTextField.getText()), bufferedImage[0]);
-            //System.out.println("Przestane myśelsć :D");
             imageView.setImage(SwingFXUtils.toFXImage(bufferedImage[0], null));
-            //System.out.println("I co teraz");
             while (!grainGrowthModel.isEndGrowSubstructure(bufferedImage[0], setOfColorBackground)) {
                 try {
                     new Robot().delay(Integer.parseInt(delayTextField.getText()));
@@ -289,7 +286,6 @@ public class MainScreenController {
 
                 grainGrowthModel.fillInfoTable(tableView, bufferedImage[0]);
             }
-            //System.out.println("Wyszedłem");
             enableButtons();
         };
         Thread thread = new Thread(runnable);
@@ -298,17 +294,17 @@ public class MainScreenController {
 
     @FXML
     public void clickGenerateDualPhase() {
-        BufferedImage bufferedImageDualPhase = SwingFXUtils.fromFXImage(imageView.getImage(),null);
+        BufferedImage bufferedImageDualPhase = SwingFXUtils.fromFXImage(imageView.getImage(), null);
 
         for (int y = 0; y < bufferedImageDualPhase.getHeight(); y++) {
             for (int x = 0; x < bufferedImageDualPhase.getWidth(); x++) {
-                if (listOfChoseColorDualPhase.contains(bufferedImageDualPhase.getRGB(x,y))) {
-                    bufferedImageDualPhase.setRGB(x,y,listOfChoseColorDualPhase.get(0));
+                if (listOfChoseColorDualPhase.contains(bufferedImageDualPhase.getRGB(x, y))) {
+                    bufferedImageDualPhase.setRGB(x, y, listOfChoseColorDualPhase.get(0));
                 }
             }
         }
 
-        imageView.setImage(SwingFXUtils.toFXImage(bufferedImageDualPhase,null));
+        imageView.setImage(SwingFXUtils.toFXImage(bufferedImageDualPhase, null));
 
         try {
             new Robot().delay(Integer.parseInt(delayTextField.getText()));
@@ -318,19 +314,19 @@ public class MainScreenController {
 
         for (int y = 0; y < bufferedImageDualPhase.getHeight(); y++) {
             for (int x = 0; x < bufferedImageDualPhase.getWidth(); x++) {
-                if (listOfChoseColorDualPhase.get(0) != bufferedImageDualPhase.getRGB(x,y)){
-                    bufferedImageDualPhase.setRGB(x,y,GrainGrowthModel.IMAGE_BACKGROUND_COLOR);
+                if (listOfChoseColorDualPhase.get(0) != bufferedImageDualPhase.getRGB(x, y)) {
+                    bufferedImageDualPhase.setRGB(x, y, GrainGrowthModel.IMAGE_BACKGROUND_COLOR);
                 }
             }
         }
 
-        imageView.setImage(SwingFXUtils.toFXImage(bufferedImageDualPhase,null));
+        imageView.setImage(SwingFXUtils.toFXImage(bufferedImageDualPhase, null));
         delayTextField.setText("1000");
-        choseOfTypeGrainGrowth(listOfChoseColorDualPhase.get(0),bufferedImageDualPhase);
+        choseOfTypeGrainGrowth(listOfChoseColorDualPhase.get(0), bufferedImageDualPhase);
         listOfChoseColorDualPhase.clear();
     }
 
-    public void addGrainToDualPhase(){
+    public void addGrainToDualPhase() {
         imageView.setOnMouseClicked((e) -> {
             if (addGrainToDualPhase.isSelected()) {
                 System.out.println("Cords [" + (int) e.getX() + ", " + (int) e.getY() + "]" +

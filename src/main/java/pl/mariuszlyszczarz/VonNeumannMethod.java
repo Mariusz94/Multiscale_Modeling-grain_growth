@@ -20,11 +20,11 @@ public class VonNeumannMethod extends GrainGrowthModel {
                     Map<Integer, Integer> neighborsMap = new HashMap<>();
                     for (int y2 = -1; y2 < 2; y2++) {
                         for (int x2 = -1; x2 < 2; x2++) {
-                            if (y2 == -1 && x2 ==-1) continue;
-                            if (y2 == -1 && x2 ==1) continue;
-                            if (y2 == 0 && x2 ==0) continue;
-                            if (y2 == 1 && x2 ==-1) continue;
-                            if (y2 == 1 && x2 ==1) continue;
+                            if (y2 == -1 && x2 == -1) continue;
+                            if (y2 == -1 && x2 == 1) continue;
+                            if (y2 == 0 && x2 == 0) continue;
+                            if (y2 == 1 && x2 == -1) continue;
+                            if (y2 == 1 && x2 == 1) continue;
 
                             int tempX = x + x2;
                             int tempY = y + y2;
@@ -37,21 +37,11 @@ public class VonNeumannMethod extends GrainGrowthModel {
                                 if (tempY < 0) {
                                     tempY = bufferedImage.getHeight() - 1;
                                 } else if (tempY > bufferedImage.getHeight() - 1) tempY = 0;
-                              /*  int value = bufferedImage.getRGB(tempX, tempY);
-
-                                if (!setOfColorBackground.contains(value) && value != IMAGE_INCLUSIONS_COLOR && coreBufferedImage.getRGB(x,y) == coreBufferedImage.getRGB(tempX,tempY)) {
-                                    if (neighborsMap.containsKey(value)) {
-                                        neighborsMap.put(value, neighborsMap.get(value) + 1);
-                                    } else {
-                                        neighborsMap.put(value, 1);
-                                    }
-                                }
-                                continue;*/
                             }
 
-                            if (/*!periodicCheckBox.isSelected() && */(tempX >= 0 && tempX < bufferedImage.getWidth() && tempY >= 0 && tempY < bufferedImage.getHeight())) {
+                            if (tempX >= 0 && tempX < bufferedImage.getWidth() && tempY >= 0 && tempY < bufferedImage.getHeight()) {
                                 int value = bufferedImage.getRGB(tempX, tempY);
-                                if (!setOfColorBackground.contains(value) && (colorDualPhase!=null ? value != colorDualPhase : true) && value != IMAGE_INCLUSIONS_COLOR && coreBufferedImage.getRGB(x,y) == coreBufferedImage.getRGB(tempX,tempY)) {
+                                if (!setOfColorBackground.contains(value) && (colorDualPhase != null ? value != colorDualPhase : true) && value != IMAGE_INCLUSIONS_COLOR && coreBufferedImage.getRGB(x, y) == coreBufferedImage.getRGB(tempX, tempY)) {
                                     if (neighborsMap.containsKey(value)) {
                                         neighborsMap.put(value, neighborsMap.get(value) + 1);
                                     } else {

@@ -23,14 +23,14 @@ public abstract class GrainGrowthModel {
 
     public abstract BufferedImage implementationMethod(BufferedImage coreBufferedImage, BufferedImage bufferedImage, CheckBox periodicCheckBox, int percentChanceToFill, Set<Integer> setOfColorBackground, Integer colorDualPhase);
 
-    public Point generateRandomPoint(int maxX, int maxY){
+    public Point generateRandomPoint(int maxX, int maxY) {
         Point point = new Point();
-        point.setLocation(generateRandomNumber(maxX),generateRandomNumber(maxY));
+        point.setLocation(generateRandomNumber(maxX), generateRandomNumber(maxY));
         logger.debug("Generate random pont [" + point.x + ", " + point.y + "]");
         return point;
     }
 
-    public Point generateRandomPointFromSubstructure(List<Point> listOfAvailablePoints){
+    public Point generateRandomPointFromSubstructure(List<Point> listOfAvailablePoints) {
         Random random = new Random();
         int number = random.nextInt(
                 listOfAvailablePoints.size());
@@ -39,21 +39,21 @@ public abstract class GrainGrowthModel {
         return point;
     }
 
-    public int generateRandomNumber(int bound){
+    public int generateRandomNumber(int bound) {
         return new Random().nextInt(bound);
     }
 
-    public BufferedImage prepareImage(int width,int height){
+    public BufferedImage prepareImage(int width, int height) {
         BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics2D = (Graphics2D) bufferedImage.getGraphics();
-        graphics2D.setPaint(new Color(237,237,237));
+        graphics2D.setPaint(new Color(237, 237, 237));
         graphics2D.fillRect(0, 0, width, height);
         logger.debug("BufferedImage has been prepared");
         return bufferedImage;
     }
 
-    public boolean isPointBusy(BufferedImage bufferedImage, Point point){
-        if (bufferedImage.getRGB(point.x,point.y) != IMAGE_BACKGROUND_COLOR){
+    public boolean isPointBusy(BufferedImage bufferedImage, Point point) {
+        if (bufferedImage.getRGB(point.x, point.y) != IMAGE_BACKGROUND_COLOR) {
             logger.debug("This point is busy");
             return true;
         }
@@ -61,8 +61,8 @@ public abstract class GrainGrowthModel {
         return false;
     }
 
-    public boolean isPointBusySubstructure(int backgroundColor, BufferedImage bufferedImage, Point point){
-        if (bufferedImage.getRGB(point.x,point.y) != backgroundColor){
+    public boolean isPointBusySubstructure(int backgroundColor, BufferedImage bufferedImage, Point point) {
+        if (bufferedImage.getRGB(point.x, point.y) != backgroundColor) {
             logger.debug("This point is busy");
             return true;
         }
@@ -70,39 +70,25 @@ public abstract class GrainGrowthModel {
         return false;
     }
 
-    public BufferedImage putGrainsToImage(int numberOfGrains,BufferedImage bufferedImage){
+    public BufferedImage putGrainsToImage(int numberOfGrains, BufferedImage bufferedImage) {
         Point point;
         for (int i = 0; i < numberOfGrains; i++) {
             do {
                 point = generateRandomPoint(bufferedImage.getWidth(), bufferedImage.getHeight());
-            }while(isPointBusy(bufferedImage, point));
+            } while (isPointBusy(bufferedImage, point));
 
-            bufferedImage.setRGB(point.x,point.y,FileManager.getMapOfColor().get(i));
+            bufferedImage.setRGB(point.x, point.y, FileManager.getMapOfColor().get(i));
             logger.debug("Superimposed grain on the image");
         }
 
         return bufferedImage;
     }
 
-    public BufferedImage putGrainsToImageSubstructure(BufferedImage coreBufferedImage, int numberOfGrains, int numberOfGrainsSubstructure, BufferedImage bufferedImage){
-      /*  Point point;
-        int nextColorToUse = numberOfGrains;
-        for (int color = 0; color < numberOfGrains; color++) {
-            for (int i = numberOfGrains; i < numberOfGrains + numberOfGrainsSubstructure; i++) {
-                do {
-                    point = generateRandomPoint(bufferedImage.getWidth(), bufferedImage.getHeight());
-                }while(isPointBusySubstructure(FileManager.getMapOfColor().get(color), bufferedImage, point));
-
-                bufferedImage.setRGB(point.x,point.y,FileManager.getMapOfColor().get(nextColorToUse++));
-                logger.debug("Superimposed grain on the image");
-            }
-        }
-
-        return bufferedImage;*/
+    public BufferedImage putGrainsToImageSubstructure(BufferedImage coreBufferedImage, int numberOfGrains, int numberOfGrainsSubstructure, BufferedImage bufferedImage) {
         Set<Integer> setColors = new LinkedHashSet<>();
         for (int y = 0; y < coreBufferedImage.getHeight(); y++) {
             for (int x = 0; x < coreBufferedImage.getWidth(); x++) {
-                setColors.add(coreBufferedImage.getRGB(x,y));
+                setColors.add(coreBufferedImage.getRGB(x, y));
             }
         }
         int biggerNumberId = 0;
@@ -111,23 +97,21 @@ public abstract class GrainGrowthModel {
         }
 
         Point point;
-        int nextColorToUse = biggerNumberId+1;
+        int nextColorToUse = biggerNumberId + 1;
         Integer[] grainColor = setColors.toArray(new Integer[0]);
         for (int color = 0; color < setColors.size(); color++) {
             List<Point> listOfAvailablePoint = new ArrayList<>();
 
             for (int y = 0; y < coreBufferedImage.getHeight(); y++) {
                 for (int x = 0; x < coreBufferedImage.getWidth(); x++) {
-                    if (coreBufferedImage.getRGB(x,y) == grainColor[color]) listOfAvailablePoint.add(new Point(x,y));
+                    if (coreBufferedImage.getRGB(x, y) == grainColor[color]) listOfAvailablePoint.add(new Point(x, y));
                 }
             }
 
             for (int i = 0; i < numberOfGrainsSubstructure; i++) {
-               // do {
-                    point = generateRandomPointFromSubstructure(listOfAvailablePoint);
-                //}while(isPointBusySubstructure(FileManager.getMapOfColor().get(color), bufferedImage, point));
+                point = generateRandomPointFromSubstructure(listOfAvailablePoint);
 
-                bufferedImage.setRGB(point.x,point.y,FileManager.getMapOfColor().get(nextColorToUse++));
+                bufferedImage.setRGB(point.x, point.y, FileManager.getMapOfColor().get(nextColorToUse++));
                 logger.debug("Superimposed grain on the image");
             }
         }
@@ -135,20 +119,21 @@ public abstract class GrainGrowthModel {
         return bufferedImage;
     }
 
-    public boolean isEndGrow(BufferedImage bufferedImage){
+    public boolean isEndGrow(BufferedImage bufferedImage) {
         for (int y = 0; y < bufferedImage.getHeight(); y++) {
             for (int x = 0; x < bufferedImage.getWidth(); x++) {
-                if (bufferedImage.getRGB(x,y) == IMAGE_BACKGROUND_COLOR)  return false;
+                if (bufferedImage.getRGB(x, y) == IMAGE_BACKGROUND_COLOR) return false;
             }
         }
         return true;
     }
 
-    public boolean isEndGrowSubstructure(BufferedImage bufferedImage, Set<Integer> setOfColor){
+    public boolean isEndGrowSubstructure(BufferedImage bufferedImage, Set<Integer> setOfColor) {
         for (int y = 0; y < bufferedImage.getHeight(); y++) {
             for (int x = 0; x < bufferedImage.getWidth(); x++) {
 
-                if (bufferedImage.getRGB(x,y) == IMAGE_BACKGROUND_COLOR || setOfColor.contains(bufferedImage.getRGB(x,y)))  return false;
+                if (bufferedImage.getRGB(x, y) == IMAGE_BACKGROUND_COLOR || setOfColor.contains(bufferedImage.getRGB(x, y)))
+                    return false;
             }
         }
         return true;
@@ -158,7 +143,7 @@ public abstract class GrainGrowthModel {
         List<Point> listOfInclusions = new ArrayList<>();
         for (int i = 0; i < numberOfInclusions; i++) {
             Point inclusionPoint;
-            do{
+            do {
                 inclusionPoint = generateRandomPoint(bufferedImage.getWidth(), bufferedImage.getHeight());
             }
             while (isPointInRangeAnotherInclusion(inclusionPoint, sizeOfInclusions, listOfInclusions));
@@ -167,13 +152,14 @@ public abstract class GrainGrowthModel {
 
         drawShape(sizeOfInclusions, typeOfInclusionsChoiceBox, bufferedImage, listOfInclusions);
     }
+
     public void putInclusionToPictureAfterGrainGrowth(int numberOfInclusions, int sizeOfInclusions, ChoiceBox<String> typeOfInclusionsChoiceBox, BufferedImage bufferedImage) {
         List<Point> listOfAllTransitions = findAllTransitions(bufferedImage);
         List<Point> listOfInclusions = new ArrayList<>();
 
         for (int i = 0; i < numberOfInclusions; i++) {
             Point inclusionPoint;
-            do{
+            do {
                 inclusionPoint = listOfAllTransitions.get(new Random().nextInt(listOfAllTransitions.size()));
             }
             while (isPointInRangeAnotherInclusion(inclusionPoint, sizeOfInclusions, listOfInclusions));
@@ -195,9 +181,9 @@ public abstract class GrainGrowthModel {
                         int tempX = x + x1;
                         int tempY = y + y1;
                         if ((tempX >= 0 && tempX < bufferedImage.getWidth() && tempY >= 0 && tempY < bufferedImage.getHeight())) {
-                            int value = bufferedImage.getRGB(tempX,tempY);
-                            if (bufferedImage.getRGB(x,y) != value && !isFind){
-                                listGrainBoundaries.add(new Point(x,y));
+                            int value = bufferedImage.getRGB(tempX, tempY);
+                            if (bufferedImage.getRGB(x, y) != value && !isFind) {
+                                listGrainBoundaries.add(new Point(x, y));
                                 isFind = true;
                             }
                         }
@@ -214,19 +200,20 @@ public abstract class GrainGrowthModel {
         Graphics2D graphics2D = (Graphics2D) bufferedImage.getGraphics();
         graphics2D.setPaint(new Color(IMAGE_INCLUSIONS_COLOR));
 
-        switch (typeOfInclusionsChoiceBox.getValue()){
+        switch (typeOfInclusionsChoiceBox.getValue()) {
             case "Circular":
-                listOfInclusions.forEach(s-> graphics2D.fillOval(s.x - sizeOfInclusions,s.y- sizeOfInclusions,2* sizeOfInclusions,2* sizeOfInclusions));
+                listOfInclusions.forEach(s -> graphics2D.fillOval(s.x - sizeOfInclusions, s.y - sizeOfInclusions, 2 * sizeOfInclusions, 2 * sizeOfInclusions));
                 break;
             case "Square":
-                int a = sizeOfInclusions /(int)(2*Math.sqrt(2));
-                listOfInclusions.forEach(s-> graphics2D.fillRect(s.x - a,s.y - a,2*a,2*a));
+                int a = sizeOfInclusions / (int) (2 * Math.sqrt(2));
+                listOfInclusions.forEach(s -> graphics2D.fillRect(s.x - a, s.y - a, 2 * a, 2 * a));
         }
     }
 
-    private boolean isPointInRangeAnotherInclusion(Point point, int sizeOfInclusions, List<Point> listOfInclusions){
+    private boolean isPointInRangeAnotherInclusion(Point point, int sizeOfInclusions, List<Point> listOfInclusions) {
         for (Point inclusion : listOfInclusions) {
-            if (Math.abs(Math.sqrt(Math.pow(point.x-inclusion.x,2) + Math.pow(point.y-inclusion.y,2))) <= 2*sizeOfInclusions) return true; //todo do distance for square
+            if (Math.abs(Math.sqrt(Math.pow(point.x - inclusion.x, 2) + Math.pow(point.y - inclusion.y, 2))) <= 2 * sizeOfInclusions)
+                return true; //todo do distance for square
         }
         return false;
     }
@@ -238,16 +225,16 @@ public abstract class GrainGrowthModel {
         return result < percentChanceToFill;
     }
 
-    void fillInfoTable(TableView<TableInfoGrainModel> tableView, BufferedImage bufferedImage){
+    void fillInfoTable(TableView<TableInfoGrainModel> tableView, BufferedImage bufferedImage) {
         int numberOfCells = bufferedImage.getHeight() * bufferedImage.getWidth();
         Map<Integer, Integer> mapOfGrains = new HashMap<>();
         for (int y = 0; y < bufferedImage.getHeight(); y++) {
             for (int x = 0; x < bufferedImage.getWidth(); x++) {
-                if (bufferedImage.getRGB(x,y) != IMAGE_BACKGROUND_COLOR){
-                    if (!mapOfGrains.containsKey(bufferedImage.getRGB(x,y))){
+                if (bufferedImage.getRGB(x, y) != IMAGE_BACKGROUND_COLOR) {
+                    if (!mapOfGrains.containsKey(bufferedImage.getRGB(x, y))) {
                         mapOfGrains.put(bufferedImage.getRGB(x, y), 1);
-                    }else{
-                        mapOfGrains.put(bufferedImage.getRGB(x, y), mapOfGrains.get(bufferedImage.getRGB(x, y))+1);
+                    } else {
+                        mapOfGrains.put(bufferedImage.getRGB(x, y), mapOfGrains.get(bufferedImage.getRGB(x, y)) + 1);
                     }
                 }
             }
@@ -258,7 +245,7 @@ public abstract class GrainGrowthModel {
             for (Map.Entry<Integer, Integer> entry : mapOfGrains.entrySet()) {
                 int idColor = 0;
                 for (Map.Entry<Integer, Integer> integerEntry : FileManager.getMapOfColor().entrySet()) {
-                    if (integerEntry.getValue().equals(entry.getKey())){
+                    if (integerEntry.getValue().equals(entry.getKey())) {
                         idColor = integerEntry.getKey();
                         break;
                     }
@@ -267,7 +254,7 @@ public abstract class GrainGrowthModel {
                 decimalFormat.setMaximumFractionDigits(2);
                 TableInfoGrainModel tableInfoGrainModel = new TableInfoGrainModel(String.valueOf(idColor),
                         String.valueOf(entry.getValue()),
-                        String.valueOf(decimalFormat.format(100*(double)entry.getValue()/numberOfCells)), //todo string format two number after dot
+                        String.valueOf(decimalFormat.format(100 * (double) entry.getValue() / numberOfCells)), //todo string format two number after dot
                         String.valueOf(ColorGenerator.getHexColor(entry.getKey())));
                 dataToTable.add(tableInfoGrainModel);
             }
@@ -275,8 +262,6 @@ public abstract class GrainGrowthModel {
             FXCollections.sort(dataToTable);
 
             tableView.setItems(dataToTable);
-
-
 
 
         }
@@ -289,12 +274,12 @@ public abstract class GrainGrowthModel {
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
 
-    public static void printInformationAboutColor(int number){
+    public static void printInformationAboutColor(int number) {
         String hexColor = String.format("#%06X", (0xFFFFFF & number));
         System.out.println(number + " to hex " + hexColor);
     }
 
-    private static Color generateRandomColor(){
+    private static Color generateRandomColor() {
         Random random = new Random();
         float r = random.nextFloat();
         float g = random.nextFloat();

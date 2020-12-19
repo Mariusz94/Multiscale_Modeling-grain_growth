@@ -18,6 +18,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +27,8 @@ import java.util.Set;
 public class MainScreenController {
 
     public static final Logger logger = Logger.getLogger(MainScreenController.class);
+
+    private List<Integer> listOfChoseColorDualPhase = new ArrayList<>();
 
     @FXML
     BorderPane borderPane;
@@ -38,7 +41,10 @@ public class MainScreenController {
     ChoiceBox<String> methodChoiceBox, typeOfInclusionsChoiceBox, methodOfPrintChoiceBox;
 
     @FXML
-    Button startButton, grainBoundariesButton, generateSubstructureButton;
+    Button startButton, grainBoundariesButton, generateSubstructureButton, generateDualPhase, clearGrainToDualPhase;
+
+    @FXML
+    ToggleButton addGrainToDualPhase;
 
     @FXML
     Label labelStatus;
@@ -87,12 +93,12 @@ public class MainScreenController {
                             @Override
                             public void updateItem(String item, boolean empty) {
                                 super.updateItem(item, empty);
-                                setText(empty ? null : getString().substring(21,28));
-                                setStyle(""+getString() + "-fx-alignment: CENTER;");
+                                setText(empty ? null : getString().substring(21, 28));
+                                setStyle("" + getString() + "-fx-alignment: CENTER;");
                             }
 
                             private String getString() {
-                                return getItem() == null ? "" : "-fx-background-color:" + getItem() +";";
+                                return getItem() == null ? "" : "-fx-background-color:" + getItem() + ";";
                             }
                         };
                         return cell;
@@ -108,17 +114,21 @@ public class MainScreenController {
         color.setCellValueFactory(new PropertyValueFactory<>("color"));
 
         imageView.setPickOnBounds(false);
-        imageView.setOnMouseClicked(e-> System.out.println("Cords [" + (int)e.getX() +", "+ (int)e.getY()+"]" +
-                " Color int =" +  ColorGenerator.getIntColor(imageView, (int)e.getX(),(int)e.getY()) +
-                ", hexColor = " + ColorGenerator.getHexColor(imageView, (int)e.getX(),(int)e.getY())));
+
+        addGrainToDualPhase();
 
         logger.debug("Initialize has ended");
-        }
+    }
 
     @FXML
     public void clickStartButton() {
         logger.info("Start button has been clicked");
 
+        choseOfTypeGrainGrowth(null, null);
+
+    }
+
+    private void choseOfTypeGrainGrowth(Integer colorDualPhase, BufferedImage bufferedImageDualPhase) {
         Set<Integer> setOfColorBackground = new LinkedHashSet<>();
         setOfColorBackground.add(GrainGrowthModel.IMAGE_BACKGROUND_COLOR);
 
@@ -127,35 +137,34 @@ public class MainScreenController {
                 logger.info("Moore algorithm has been started");
 
                 MooreMethod mooreMethod = new MooreMethod();
-                runMethodGrow(mooreMethod, setOfColorBackground);
+                runMethodGrow(mooreMethod, setOfColorBackground, colorDualPhase, bufferedImageDualPhase);
 
                 break;
             case "Von Neumann":
                 logger.info("Von Neumann algorithm has been started");
 
                 VonNeumannMethod vonNeumannMethod = new VonNeumannMethod();
-                runMethodGrow(vonNeumannMethod, setOfColorBackground);
+                runMethodGrow(vonNeumannMethod, setOfColorBackground, colorDualPhase, bufferedImageDualPhase);
                 break;
             case "Grain boundary shape control":
                 logger.info("Grain boundary shape control algorithm has been started");
 
                 GrainBoundaryShapeControlMethod grainBoundaryShapeControlMethod = new GrainBoundaryShapeControlMethod();
-                runMethodGrow(grainBoundaryShapeControlMethod, setOfColorBackground);
+                runMethodGrow(grainBoundaryShapeControlMethod, setOfColorBackground, colorDualPhase, bufferedImageDualPhase);
                 break;
 
         }
-
     }
 
-    private void runMethodGrow(GrainGrowthModel grainGrowthModel, Set<Integer> setOfColorBackground) {
-        if (Integer.parseInt(percentChanceToFillTextField.getText().trim()) !=0) {
+    private void runMethodGrow(GrainGrowthModel grainGrowthModel, Set<Integer> setOfColorBackground, Integer colorDualPhase, BufferedImage bufferedImageDualPhase) {
+        if (Integer.parseInt(percentChanceToFillTextField.getText().trim()) != 0) {
             disableButtons();
-            BufferedImage bufferedImage = grainGrowthModel.prepareImage(Integer.parseInt(sizeXTextField.getText()), Integer.parseInt(sizeYTextField.getText()));
-            BufferedImage coreBufferedImage = GrainGrowthModel.deepCopyOfBufferedImage(bufferedImage);
-            imageView.setFitWidth(bufferedImage.getWidth());
-            imageView.setFitHeight(bufferedImage.getHeight());
+            final BufferedImage[] bufferedImage = {grainGrowthModel.prepareImage(Integer.parseInt(sizeXTextField.getText()), Integer.parseInt(sizeYTextField.getText()))};
+            BufferedImage coreBufferedImage = GrainGrowthModel.deepCopyOfBufferedImage(bufferedImage[0]);
+            imageView.setFitWidth(bufferedImage[0].getWidth());
+            imageView.setFitHeight(bufferedImage[0].getHeight());
 
-            final BufferedImage[] finalBufferedImage = {bufferedImage};
+            final BufferedImage[] finalBufferedImage = {bufferedImage[0]};
             Runnable runnable = () -> {
                 if (Integer.parseInt(numberOfInclusionsTextField.getText()) != 0 && Integer.parseInt(sizeOfInclusionsTextField.getText()) != 0 && methodOfPrintChoiceBox.getValue().equals("At the beginning")) {
                     grainGrowthModel.putInclusionToPictureBeforeStart(Integer.parseInt(numberOfInclusionsTextField.getText()), Integer.parseInt(sizeOfInclusionsTextField.getText()), typeOfInclusionsChoiceBox, finalBufferedImage[0]);
@@ -166,17 +175,28 @@ public class MainScreenController {
                         e.printStackTrace();
                     }
                 }
+                if (bufferedImageDualPhase != null){
+                    try {
+                        new Robot().delay(Integer.parseInt(delayTextField.getText()));
+                    } catch (AWTException e) {
+                        e.printStackTrace();
+                    }
+                    delayTextField.setText("0"); //todo previous value
+                    bufferedImage[0] =null;
+                    bufferedImage[0] = GrainGrowthModel.deepCopyOfBufferedImage(bufferedImageDualPhase);
+                }
 
-                finalBufferedImage[0] = grainGrowthModel.putGrainsToImage(Integer.parseInt(numberOfGrainsTextField.getText()), bufferedImage);
+                finalBufferedImage[0] = grainGrowthModel.putGrainsToImage(Integer.parseInt(numberOfGrainsTextField.getText()), bufferedImage[0]);
 
                 imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
+
                 while (!grainGrowthModel.isEndGrow(finalBufferedImage[0])) {
                     try {
                         new Robot().delay(Integer.parseInt(delayTextField.getText()));
                     } catch (AWTException e) {
                         e.printStackTrace();
                     }
-                    finalBufferedImage[0] = grainGrowthModel.implementationMethod(coreBufferedImage, (finalBufferedImage[0]), periodicCheckBox, Integer.parseInt(percentChanceToFillTextField.getText().trim()), setOfColorBackground);
+                    finalBufferedImage[0] = grainGrowthModel.implementationMethod(coreBufferedImage, (finalBufferedImage[0]), periodicCheckBox, Integer.parseInt(percentChanceToFillTextField.getText().trim()), setOfColorBackground, colorDualPhase);
                     imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
                     grainGrowthModel.fillInfoTable(tableView, finalBufferedImage[0]);
                 }
@@ -198,28 +218,28 @@ public class MainScreenController {
     }
 
     @FXML
-    public void clickGrainBoundariesButton(){
-        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(imageView.getImage(),null);
+    public void clickGrainBoundariesButton() {
+        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(imageView.getImage(), null);
         List<Point> listOfTransitions = GrainGrowthModel.findAllTransitions(bufferedImage);
-        Graphics2D graphics2D = (Graphics2D)bufferedImage.getGraphics();
+        Graphics2D graphics2D = (Graphics2D) bufferedImage.getGraphics();
         graphics2D.setPaint(Color.WHITE);
-        graphics2D.fillRect(0,0,bufferedImage.getWidth(),bufferedImage.getHeight());
-        listOfTransitions.forEach(s -> bufferedImage.setRGB(s.x,s.y, Color.BLACK.getRGB()));
-        imageView.setImage(SwingFXUtils.toFXImage(bufferedImage,null));
+        graphics2D.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
+        listOfTransitions.forEach(s -> bufferedImage.setRGB(s.x, s.y, Color.BLACK.getRGB()));
+        imageView.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
     }
 
     @FXML
-    public void clickGenerateSubstructureButton(){
+    public void clickGenerateSubstructureButton() {
         logger.info("Called method GenerateSubstructureButton");
         disableButtons();
 
         Image coreImage = imageView.getImage();
-        BufferedImage coreBufferedImage = SwingFXUtils.fromFXImage(coreImage,null);
+        BufferedImage coreBufferedImage = SwingFXUtils.fromFXImage(coreImage, null);
 
         Set<Integer> setOfColorBackground = new LinkedHashSet<>();
         for (int y = 0; y < coreBufferedImage.getHeight(); y++) {
             for (int x = 0; x < coreBufferedImage.getWidth(); x++) {
-                setOfColorBackground.add(coreBufferedImage.getRGB(x,y));
+                setOfColorBackground.add(coreBufferedImage.getRGB(x, y));
             }
         }
 
@@ -248,14 +268,14 @@ public class MainScreenController {
 
     private void runMethodGrowSubstructure(GrainGrowthModel grainGrowthModel, Set<Integer> setOfColorBackground) {
         Image coreImage = imageView.getImage();
-        BufferedImage coreBufferedImage = SwingFXUtils.fromFXImage(coreImage,null);
+        BufferedImage coreBufferedImage = SwingFXUtils.fromFXImage(coreImage, null);
         final BufferedImage[] bufferedImage = {GrainGrowthModel.deepCopyOfBufferedImage(coreBufferedImage)};
 
         Runnable runnable = () -> {
             //System.out.println("wszedłem i myśle");
             bufferedImage[0] = grainGrowthModel.putGrainsToImageSubstructure(coreBufferedImage, Integer.parseInt(numberOfGrainsTextField.getText()), Integer.parseInt(numberOfGrainsSubstructureTextField.getText()), bufferedImage[0]);
             //System.out.println("Przestane myśelsć :D");
-            imageView.setImage(SwingFXUtils.toFXImage(bufferedImage[0],null));
+            imageView.setImage(SwingFXUtils.toFXImage(bufferedImage[0], null));
             //System.out.println("I co teraz");
             while (!grainGrowthModel.isEndGrowSubstructure(bufferedImage[0], setOfColorBackground)) {
                 try {
@@ -263,7 +283,7 @@ public class MainScreenController {
                 } catch (AWTException e) {
                     e.printStackTrace();
                 }
-                bufferedImage[0] = grainGrowthModel.implementationMethod(coreBufferedImage, bufferedImage[0], periodicCheckBox, Integer.parseInt(percentChanceToFillTextField.getText().trim()), setOfColorBackground);
+                bufferedImage[0] = grainGrowthModel.implementationMethod(coreBufferedImage, bufferedImage[0], periodicCheckBox, Integer.parseInt(percentChanceToFillTextField.getText().trim()), setOfColorBackground, null); //todo color of dualPhase
 
                 imageView.setImage(SwingFXUtils.toFXImage(bufferedImage[0], null));
 
@@ -274,6 +294,58 @@ public class MainScreenController {
         };
         Thread thread = new Thread(runnable);
         thread.start();
+    }
+
+    @FXML
+    public void clickGenerateDualPhase() {
+        BufferedImage bufferedImageDualPhase = SwingFXUtils.fromFXImage(imageView.getImage(),null);
+
+        for (int y = 0; y < bufferedImageDualPhase.getHeight(); y++) {
+            for (int x = 0; x < bufferedImageDualPhase.getWidth(); x++) {
+                if (listOfChoseColorDualPhase.contains(bufferedImageDualPhase.getRGB(x,y))) {
+                    bufferedImageDualPhase.setRGB(x,y,listOfChoseColorDualPhase.get(0));
+                }
+            }
+        }
+
+        imageView.setImage(SwingFXUtils.toFXImage(bufferedImageDualPhase,null));
+
+        try {
+            new Robot().delay(Integer.parseInt(delayTextField.getText()));
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+
+        for (int y = 0; y < bufferedImageDualPhase.getHeight(); y++) {
+            for (int x = 0; x < bufferedImageDualPhase.getWidth(); x++) {
+                if (listOfChoseColorDualPhase.get(0) != bufferedImageDualPhase.getRGB(x,y)){
+                    bufferedImageDualPhase.setRGB(x,y,GrainGrowthModel.IMAGE_BACKGROUND_COLOR);
+                }
+            }
+        }
+
+        imageView.setImage(SwingFXUtils.toFXImage(bufferedImageDualPhase,null));
+        delayTextField.setText("1000");
+        choseOfTypeGrainGrowth(listOfChoseColorDualPhase.get(0),bufferedImageDualPhase);
+        listOfChoseColorDualPhase.clear();
+    }
+
+    public void addGrainToDualPhase(){
+        imageView.setOnMouseClicked((e) -> {
+            if (addGrainToDualPhase.isSelected()) {
+                System.out.println("Cords [" + (int) e.getX() + ", " + (int) e.getY() + "]" +
+                        " Color int =" + ColorGenerator.getIntColor(imageView, (int) e.getX(), (int) e.getY()) +
+                        ", hexColor = " + ColorGenerator.getHexColor(imageView, (int) e.getX(), (int) e.getY()));
+                listOfChoseColorDualPhase.add(Integer.parseInt(ColorGenerator.getIntColor(imageView, (int) e.getX(), (int) e.getY())));
+                System.out.println(listOfChoseColorDualPhase.size() + " Rozmiar listy");
+            }
+        });
+    }
+
+
+    @FXML
+    public void clickClearGrainToDualPhase() {
+        listOfChoseColorDualPhase.clear();
     }
 
     @FXML
@@ -339,16 +411,22 @@ public class MainScreenController {
         return file;
     }
 
-    private void disableButtons(){
+    private void disableButtons() {
         generateSubstructureButton.setDisable(true);
         grainBoundariesButton.setDisable(true);
         startButton.setDisable(true);
+        addGrainToDualPhase.setDisable(true);
+        clearGrainToDualPhase.setDisable(true);
+        generateDualPhase.setDisable(true);
     }
 
-    private void enableButtons(){
+    private void enableButtons() {
         generateSubstructureButton.setDisable(false);
         grainBoundariesButton.setDisable(false);
         startButton.setDisable(false);
+        addGrainToDualPhase.setDisable(false);
+        clearGrainToDualPhase.setDisable(false);
+        generateDualPhase.setDisable(false);
     }
 }
 

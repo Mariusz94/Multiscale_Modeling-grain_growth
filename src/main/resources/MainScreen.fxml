@@ -69,7 +69,10 @@
                         <Tooltip text="max 100 000" />
                      </tooltip>
                   </TextField>
+                  <ToggleButton fx:id="addGrainToDualPhase" layoutX="351.0" layoutY="6.0" text="Add grain" />
                   <Button fx:id="generateSubstructureButton" layoutX="168.0" layoutY="72.0" mnemonicParsing="false" onAction="#clickGenerateSubstructureButton" text="Generate substructure" />
+                  <Button fx:id="generateDualPhase" layoutX="420.0" layoutY="6.0" mnemonicParsing="false" onAction="#clickGenerateDualPhase" text="Generate DualPhase" />
+                  <Button fx:id="clearGrainToDualPhase" layoutX="275.0" layoutY="6.0" mnemonicParsing="false" onAction="#clickClearGrainToDualPhase" text="Clear grain" />
                </children>
             </Pane>
             <Pane layoutX="25.0" layoutY="375.0" prefHeight="360.0" prefWidth="550.0" style="-fx-background-color: #EDEDED;">

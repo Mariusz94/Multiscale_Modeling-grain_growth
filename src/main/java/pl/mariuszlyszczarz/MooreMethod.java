@@ -12,7 +12,7 @@ public class MooreMethod extends GrainGrowthModel {
     //public static final Logger logger = Logger.getLogger(MooreMethod.class);
 
     @Override
-    public BufferedImage implementationMethod(BufferedImage coreBufferedImage, BufferedImage bufferedImage, CheckBox periodicCheckBox, int percentChanceToFill, Set<Integer> setOfColorBackground) {
+    public BufferedImage implementationMethod(BufferedImage coreBufferedImage, BufferedImage bufferedImage, CheckBox periodicCheckBox, int percentChanceToFill, Set<Integer> setOfColorBackground, Integer colorDualPhase) {
         BufferedImage bufferedImageNew = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
         for (int y = 0; y < bufferedImage.getHeight(); y++) {
             for (int x = 0; x < bufferedImage.getWidth(); x++) {
@@ -47,7 +47,7 @@ public class MooreMethod extends GrainGrowthModel {
 
                             if (/*!periodicCheckBox.isSelected() && */(tempX >= 0 && tempX < bufferedImage.getWidth() && tempY >= 0 && tempY < bufferedImage.getHeight())) {
                                 int value = bufferedImage.getRGB(tempX, tempY);
-                                if (!setOfColorBackground.contains(value) && value != IMAGE_INCLUSIONS_COLOR && coreBufferedImage.getRGB(x,y) == coreBufferedImage.getRGB(tempX,tempY)) {
+                                if (!setOfColorBackground.contains(value) && (colorDualPhase!=null ? value != colorDualPhase : true) && value != IMAGE_INCLUSIONS_COLOR && coreBufferedImage.getRGB(x,y) == coreBufferedImage.getRGB(tempX,tempY)) {
                                     if (neighborsMap.containsKey(value)) {
                                         neighborsMap.put(value, neighborsMap.get(value) + 1);
                                     } else {

@@ -21,7 +21,7 @@ public abstract class GrainGrowthModel {
     final static int IMAGE_BACKGROUND_COLOR = -1184275;
     final static int IMAGE_INCLUSIONS_COLOR = -16777216;
 
-    public abstract BufferedImage implementationMethod(BufferedImage coreBufferedImage, BufferedImage bufferedImage, CheckBox periodicCheckBox, int percentChanceToFill, Set<Integer> setOfColorBackground);
+    public abstract BufferedImage implementationMethod(BufferedImage coreBufferedImage, BufferedImage bufferedImage, CheckBox periodicCheckBox, int percentChanceToFill, Set<Integer> setOfColorBackground, Integer colorDualPhase);
 
     public Point generateRandomPoint(int maxX, int maxY){
         Point point = new Point();
@@ -76,7 +76,6 @@ public abstract class GrainGrowthModel {
             do {
                 point = generateRandomPoint(bufferedImage.getWidth(), bufferedImage.getHeight());
             }while(isPointBusy(bufferedImage, point));
-            //todo generate random color
 
             bufferedImage.setRGB(point.x,point.y,FileManager.getMapOfColor().get(i));
             logger.debug("Superimposed grain on the image");
@@ -89,7 +88,6 @@ public abstract class GrainGrowthModel {
       /*  Point point;
         int nextColorToUse = numberOfGrains;
         for (int color = 0; color < numberOfGrains; color++) {
-            //todo do map of single grain
             for (int i = numberOfGrains; i < numberOfGrains + numberOfGrainsSubstructure; i++) {
                 do {
                     point = generateRandomPoint(bufferedImage.getWidth(), bufferedImage.getHeight());
@@ -127,7 +125,6 @@ public abstract class GrainGrowthModel {
             for (int i = 0; i < numberOfGrainsSubstructure; i++) {
                // do {
                     point = generateRandomPointFromSubstructure(listOfAvailablePoint);
-                    //System.out.println("wyszedłem");
                 //}while(isPointBusySubstructure(FileManager.getMapOfColor().get(color), bufferedImage, point));
 
                 bufferedImage.setRGB(point.x,point.y,FileManager.getMapOfColor().get(nextColorToUse++));

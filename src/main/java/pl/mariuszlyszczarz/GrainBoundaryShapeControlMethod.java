@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class GrainBoundaryShapeControlMethod extends GrainGrowthModel {
     @Override
-    public BufferedImage implementationMethod(BufferedImage coreBufferedImage, BufferedImage bufferedImage, CheckBox periodicCheckBox, int percentChanceToFill, Set<Integer> setOfColorBackground) {
+    public BufferedImage implementationMethod(BufferedImage coreBufferedImage, BufferedImage bufferedImage, CheckBox periodicCheckBox, int percentChanceToFill, Set<Integer> setOfColorBackground, Integer colorDualPhase) {
         BufferedImage bufferedImageNew = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
         for (int y = 0; y < bufferedImage.getHeight(); y++) {
             for (int x = 0; x < bufferedImage.getWidth(); x++) {
@@ -24,7 +24,7 @@ public class GrainBoundaryShapeControlMethod extends GrainGrowthModel {
                             int tempX = x + x2;
                             int tempY = y + y2;
 
-                            addNeighborsToMap(coreBufferedImage, bufferedImage, periodicCheckBox, neighborsMap, x, y, tempX, tempY, setOfColorBackground);
+                            addNeighborsToMap(coreBufferedImage, bufferedImage, periodicCheckBox, neighborsMap, x, y, tempX, tempY, setOfColorBackground, colorDualPhase);
                         }
                     }
 
@@ -57,7 +57,7 @@ public class GrainBoundaryShapeControlMethod extends GrainGrowthModel {
                                 int tempX = x + x2;
                                 int tempY = y + y2;
 
-                                addNeighborsToMap(coreBufferedImage, bufferedImage, periodicCheckBox, neighborsMap, x, y, tempX, tempY, setOfColorBackground);
+                                addNeighborsToMap(coreBufferedImage, bufferedImage, periodicCheckBox, neighborsMap, x, y, tempX, tempY, setOfColorBackground, colorDualPhase);
                             }
                         }
                     }
@@ -86,7 +86,7 @@ public class GrainBoundaryShapeControlMethod extends GrainGrowthModel {
                                 int tempX = x + x2;
                                 int tempY = y + y2;
 
-                                addNeighborsToMap(coreBufferedImage, bufferedImage, periodicCheckBox, neighborsMap, x, y, tempX, tempY, setOfColorBackground);
+                                addNeighborsToMap(coreBufferedImage, bufferedImage, periodicCheckBox, neighborsMap, x, y, tempX, tempY, setOfColorBackground, colorDualPhase);
                             }
                         }
                     }
@@ -112,7 +112,7 @@ public class GrainBoundaryShapeControlMethod extends GrainGrowthModel {
                                     int tempX = x + x2;
                                     int tempY = y + y2;
 
-                                    addNeighborsToMap(coreBufferedImage, bufferedImage, periodicCheckBox, neighborsMap, x, y, tempX, tempY, setOfColorBackground);
+                                    addNeighborsToMap(coreBufferedImage, bufferedImage, periodicCheckBox, neighborsMap, x, y, tempX, tempY, setOfColorBackground, colorDualPhase);
 
 
                                 }
@@ -135,7 +135,8 @@ public class GrainBoundaryShapeControlMethod extends GrainGrowthModel {
                     }
                     //End Role 4
 
-                    if (bufferedImageNew.getRGB(x,y) == IMAGE_INCLUSIONS_COLOR) bufferedImageNew.setRGB(x, y, bufferedImage.getRGB(x, y));
+                    if (bufferedImageNew.getRGB(x, y) == IMAGE_INCLUSIONS_COLOR || (colorDualPhase != null ? bufferedImageNew.getRGB(x, y) == colorDualPhase : false))
+                        bufferedImageNew.setRGB(x, y, bufferedImage.getRGB(x, y));
 
                 } else {
                     bufferedImageNew.setRGB(x, y, bufferedImage.getRGB(x, y));
@@ -145,7 +146,7 @@ public class GrainBoundaryShapeControlMethod extends GrainGrowthModel {
         return bufferedImageNew;
     }
 
-    private void addNeighborsToMap(BufferedImage coreBufferedImage, BufferedImage bufferedImage, CheckBox periodicCheckBox, Map<Integer, Integer> neighborsMap, int x, int y, int tempX, int tempY, Set<Integer> setOfColorBackground) {
+    private void addNeighborsToMap(BufferedImage coreBufferedImage, BufferedImage bufferedImage, CheckBox periodicCheckBox, Map<Integer, Integer> neighborsMap, int x, int y, int tempX, int tempY, Set<Integer> setOfColorBackground, Integer colorDualPhase) {
         if (periodicCheckBox.isSelected()) {
 
             if (tempX < 0) {
@@ -168,7 +169,7 @@ public class GrainBoundaryShapeControlMethod extends GrainGrowthModel {
 
         if (/*!periodicCheckBox.isSelected() && */(tempX >= 0 && tempX < bufferedImage.getWidth() && tempY >= 0 && tempY < bufferedImage.getHeight())) {
             int value = bufferedImage.getRGB(tempX, tempY);
-            if (!setOfColorBackground.contains(value) && value != IMAGE_INCLUSIONS_COLOR  && coreBufferedImage.getRGB(x,y) == coreBufferedImage.getRGB(tempX,tempY)) {
+            if (!setOfColorBackground.contains(value) && (colorDualPhase != null ? value != colorDualPhase : true) && value != IMAGE_INCLUSIONS_COLOR && coreBufferedImage.getRGB(x, y) == coreBufferedImage.getRGB(tempX, tempY)) {
                 if (neighborsMap.containsKey(value)) {
                     neighborsMap.put(value, neighborsMap.get(value) + 1);
                 } else {

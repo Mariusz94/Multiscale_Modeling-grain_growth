@@ -18,7 +18,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class MainScreenController {
@@ -30,13 +32,13 @@ public class MainScreenController {
     private static BorderPane pane;
 
     @FXML
-    TextField sizeXTextField, sizeYTextField, numberOfGrainsTextField, delayTextField, numberOfInclusionsTextField, sizeOfInclusionsTextField, percentChanceToFillTextField;
+    TextField sizeXTextField, sizeYTextField, numberOfGrainsTextField, delayTextField, numberOfInclusionsTextField, sizeOfInclusionsTextField, percentChanceToFillTextField, numberOfGrainsSubstructureTextField;
 
     @FXML
     ChoiceBox<String> methodChoiceBox, typeOfInclusionsChoiceBox, methodOfPrintChoiceBox;
 
     @FXML
-    Button startButton, grainBoundariesButton;
+    Button startButton, grainBoundariesButton, generateSubstructureButton;
 
     @FXML
     Label labelStatus;
@@ -117,34 +119,39 @@ public class MainScreenController {
     public void clickStartButton() {
         logger.info("Start button has been clicked");
 
+        Set<Integer> setOfColorBackground = new LinkedHashSet<>();
+        setOfColorBackground.add(GrainGrowthModel.IMAGE_BACKGROUND_COLOR);
+
         switch (methodChoiceBox.getValue()) {
             case "Moore":
                 logger.info("Moore algorithm has been started");
 
                 MooreMethod mooreMethod = new MooreMethod();
-                runMethodGrow(mooreMethod);
+                runMethodGrow(mooreMethod, setOfColorBackground);
 
                 break;
             case "Von Neumann":
                 logger.info("Von Neumann algorithm has been started");
 
                 VonNeumannMethod vonNeumannMethod = new VonNeumannMethod();
-                runMethodGrow(vonNeumannMethod);
+                runMethodGrow(vonNeumannMethod, setOfColorBackground);
                 break;
             case "Grain boundary shape control":
                 logger.info("Grain boundary shape control algorithm has been started");
 
                 GrainBoundaryShapeControlMethod grainBoundaryShapeControlMethod = new GrainBoundaryShapeControlMethod();
-                runMethodGrow(grainBoundaryShapeControlMethod);
+                runMethodGrow(grainBoundaryShapeControlMethod, setOfColorBackground);
                 break;
 
         }
 
     }
 
-    private void runMethodGrow(GrainGrowthModel grainGrowthModel) {
+    private void runMethodGrow(GrainGrowthModel grainGrowthModel, Set<Integer> setOfColorBackground) {
         if (Integer.parseInt(percentChanceToFillTextField.getText().trim()) !=0) {
+            disableButtons();
             BufferedImage bufferedImage = grainGrowthModel.prepareImage(Integer.parseInt(sizeXTextField.getText()), Integer.parseInt(sizeYTextField.getText()));
+            BufferedImage coreBufferedImage = GrainGrowthModel.deepCopyOfBufferedImage(bufferedImage);
             imageView.setFitWidth(bufferedImage.getWidth());
             imageView.setFitHeight(bufferedImage.getHeight());
 
@@ -169,7 +176,7 @@ public class MainScreenController {
                     } catch (AWTException e) {
                         e.printStackTrace();
                     }
-                    finalBufferedImage[0] = grainGrowthModel.implementationMethod((finalBufferedImage[0]), periodicCheckBox, Integer.parseInt(percentChanceToFillTextField.getText().trim()));
+                    finalBufferedImage[0] = grainGrowthModel.implementationMethod(coreBufferedImage, (finalBufferedImage[0]), periodicCheckBox, Integer.parseInt(percentChanceToFillTextField.getText().trim()), setOfColorBackground);
                     imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
                     grainGrowthModel.fillInfoTable(tableView, finalBufferedImage[0]);
                 }
@@ -182,7 +189,7 @@ public class MainScreenController {
                     }
                     imageView.setImage(SwingFXUtils.toFXImage(finalBufferedImage[0], null));
                 }
-
+                enableButtons();
             };
 
             Thread thread = new Thread(runnable);
@@ -199,6 +206,74 @@ public class MainScreenController {
         graphics2D.fillRect(0,0,bufferedImage.getWidth(),bufferedImage.getHeight());
         listOfTransitions.forEach(s -> bufferedImage.setRGB(s.x,s.y, Color.BLACK.getRGB()));
         imageView.setImage(SwingFXUtils.toFXImage(bufferedImage,null));
+    }
+
+    @FXML
+    public void clickGenerateSubstructureButton(){
+        logger.info("Called method GenerateSubstructureButton");
+        disableButtons();
+
+        Image coreImage = imageView.getImage();
+        BufferedImage coreBufferedImage = SwingFXUtils.fromFXImage(coreImage,null);
+
+        Set<Integer> setOfColorBackground = new LinkedHashSet<>();
+        for (int y = 0; y < coreBufferedImage.getHeight(); y++) {
+            for (int x = 0; x < coreBufferedImage.getWidth(); x++) {
+                setOfColorBackground.add(coreBufferedImage.getRGB(x,y));
+            }
+        }
+
+        switch (methodChoiceBox.getValue()) {
+            case "Moore":
+                logger.info("Moore algorithm has been started");
+
+                MooreMethod mooreMethod = new MooreMethod();
+                runMethodGrowSubstructure(mooreMethod, setOfColorBackground);
+
+                break;
+            case "Von Neumann":
+                logger.info("Von Neumann algorithm has been started");
+
+                VonNeumannMethod vonNeumannMethod = new VonNeumannMethod();
+                runMethodGrowSubstructure(vonNeumannMethod, setOfColorBackground);
+                break;
+            case "Grain boundary shape control":
+                logger.info("Grain boundary shape control algorithm has been started");
+
+                GrainBoundaryShapeControlMethod grainBoundaryShapeControlMethod = new GrainBoundaryShapeControlMethod();
+                runMethodGrowSubstructure(grainBoundaryShapeControlMethod, setOfColorBackground);
+                break;
+        }
+    }
+
+    private void runMethodGrowSubstructure(GrainGrowthModel grainGrowthModel, Set<Integer> setOfColorBackground) {
+        Image coreImage = imageView.getImage();
+        BufferedImage coreBufferedImage = SwingFXUtils.fromFXImage(coreImage,null);
+        final BufferedImage[] bufferedImage = {GrainGrowthModel.deepCopyOfBufferedImage(coreBufferedImage)};
+
+        Runnable runnable = () -> {
+            //System.out.println("wszedłem i myśle");
+            bufferedImage[0] = grainGrowthModel.putGrainsToImageSubstructure(coreBufferedImage, Integer.parseInt(numberOfGrainsTextField.getText()), Integer.parseInt(numberOfGrainsSubstructureTextField.getText()), bufferedImage[0]);
+            //System.out.println("Przestane myśelsć :D");
+            imageView.setImage(SwingFXUtils.toFXImage(bufferedImage[0],null));
+            //System.out.println("I co teraz");
+            while (!grainGrowthModel.isEndGrowSubstructure(bufferedImage[0], setOfColorBackground)) {
+                try {
+                    new Robot().delay(Integer.parseInt(delayTextField.getText()));
+                } catch (AWTException e) {
+                    e.printStackTrace();
+                }
+                bufferedImage[0] = grainGrowthModel.implementationMethod(coreBufferedImage, bufferedImage[0], periodicCheckBox, Integer.parseInt(percentChanceToFillTextField.getText().trim()), setOfColorBackground);
+
+                imageView.setImage(SwingFXUtils.toFXImage(bufferedImage[0], null));
+
+                grainGrowthModel.fillInfoTable(tableView, bufferedImage[0]);
+            }
+            //System.out.println("Wyszedłem");
+            enableButtons();
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
     }
 
     @FXML
@@ -264,6 +339,17 @@ public class MainScreenController {
         return file;
     }
 
+    private void disableButtons(){
+        generateSubstructureButton.setDisable(true);
+        grainBoundariesButton.setDisable(true);
+        startButton.setDisable(true);
+    }
+
+    private void enableButtons(){
+        generateSubstructureButton.setDisable(false);
+        grainBoundariesButton.setDisable(false);
+        startButton.setDisable(false);
+    }
 }
 
 

@@ -38,14 +38,14 @@ public class FileManager {
         }
     }
 
-    private static int findIdColor(int color){
+
+    public static int findIdColor(int color){
         if (color == GrainGrowthModel.IMAGE_INCLUSIONS_COLOR) return INCLUSION_ID;
         for (Map.Entry<Integer, Integer> colorEntry : mapOfColor.entrySet()) {
             if (colorEntry.getValue() == color) return colorEntry.getKey();
         }
         return 0;
     }
-
     public static Image readDataFormDataFile() throws IOException {
         File file = MainScreenController.choiceFile("txt", "open");
         BufferedImage bufferedImage;

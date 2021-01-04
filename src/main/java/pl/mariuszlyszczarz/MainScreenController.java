@@ -35,7 +35,7 @@ public class MainScreenController {
     private static BorderPane pane;
 
     @FXML
-    TextField sizeXTextField, sizeYTextField, numberOfGrainsTextField, delayTextField, numberOfInclusionsTextField, sizeOfInclusionsTextField, percentChanceToFillTextField, numberOfGrainsSubstructureTextField;
+    TextField sizeXTextField, sizeYTextField, numberOfGrainsTextField, delayTextField, numberOfInclusionsTextField, sizeOfInclusionsTextField, percentChanceToFillTextField, numberOfGrainsSubstructureTextField, thicknessGrainBoundariesTextField;
 
     @FXML
     ChoiceBox<String> methodChoiceBox, typeOfInclusionsChoiceBox, methodOfPrintChoiceBox;
@@ -224,7 +224,9 @@ public class MainScreenController {
         Graphics2D graphics2D = (Graphics2D) bufferedImage.getGraphics();
         graphics2D.setPaint(Color.WHITE);
         graphics2D.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
-        listOfTransitions.forEach(s -> bufferedImage.setRGB(s.x, s.y, Color.BLACK.getRGB()));
+        //listOfTransitions.forEach(s -> bufferedImage.setRGB(s.x, s.y, Color.BLACK.getRGB()));
+        graphics2D.setPaint(Color.BLACK);
+        listOfTransitions.forEach(s -> graphics2D.fillRect(s.x, s.y,Integer.parseInt(thicknessGrainBoundariesTextField.getText()),Integer.parseInt(thicknessGrainBoundariesTextField.getText()) ));
         imageView.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
     }
 

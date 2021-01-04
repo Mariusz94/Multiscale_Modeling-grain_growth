@@ -188,6 +188,7 @@ public abstract class GrainGrowthModel {
                             }
                         }
                     }
+                    if(isFind) break;
                 }
             }
         }

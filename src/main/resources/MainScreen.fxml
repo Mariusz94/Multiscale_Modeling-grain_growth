@@ -73,6 +73,12 @@
                   <Button fx:id="generateSubstructureButton" layoutX="168.0" layoutY="72.0" mnemonicParsing="false" onAction="#clickGenerateSubstructureButton" text="Generate substructure" />
                   <Button fx:id="generateDualPhase" layoutX="420.0" layoutY="6.0" mnemonicParsing="false" onAction="#clickGenerateDualPhase" text="Generate DualPhase" />
                   <Button fx:id="clearGrainToDualPhase" layoutX="275.0" layoutY="6.0" mnemonicParsing="false" onAction="#clickClearGrainToDualPhase" text="Clear grain" />
+                  <TextField fx:id="thicknessGrainBoundariesTextField" layoutX="480.0" layoutY="44.0" prefHeight="25.0" prefWidth="49.0" text="1">
+                     <tooltip>
+                        <Tooltip text="max 100 000" />
+                     </tooltip>
+                  </TextField>
+                  <Label layoutX="420.0" layoutY="48.0" text="Thickness" />
                </children>
             </Pane>
             <Pane layoutX="25.0" layoutY="375.0" prefHeight="360.0" prefWidth="550.0" style="-fx-background-color: #EDEDED;">
